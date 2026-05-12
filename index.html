@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>MC铁路12306</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, 'Helvetica Neue', sans-serif;
+            background: #eef2f8;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航栏 */
+        .header {
+            background: linear-gradient(135deg, #0a5c8e 0%, #1a6fa8 100%);
+            color: white;
+            padding: 0.8rem 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo span {
+            background: #ffd700;
+            color: #0a5c8e;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 30px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .nav-btn.active {
+            background: #ffd700;
+            color: #0a5c8e;
+        }
+
+        .nav-btn:hover:not(.active) {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* 主内容区 */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            min-height: calc(100vh - 130px);
+        }
+
+        /* 页面切换 */
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .page.active-page {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 卡片样式 */
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 28px 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            margin-bottom: 25px;
+            border: 1px solid #e0e8f0;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a3a5c;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #ffd700;
+            display: inline-block;
+        }
+
+        /* 查询表单 */
+        .query-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-end;
+            background: #f8fafd;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: #6c7a8e;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #1a6fa8;
+            box-shadow: 0 0 0 3px rgba(26,111,168,0.1);
+        }
+
+        .search-btn {
+            background: #ffd700;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0a5c8e;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            min-width: 120px;
+        }
+
+        .search-btn:hover {
+            background: #ffc107;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* 车次列表表格 */
+        .train-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .train-table th, .train-table td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e9edf2;
+        }
+
+        .train-table th {
+            background: #f0f4f9;
+            color: #1a3a5c;
+            font-weight: 600;
+        }
+
+        .train-table tr:hover {
+            background: #f8fafd;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-g { background: #f3f4f6; color: #374151; }
+        .badge-d { background: #e6f7e6; color: #2e7d32; }
+        .badge-k { background: #fff3e0; color: #e67e22; }
+        .badge-z { background: #ffebee; color: #c62828; }
+
+        .empty-msg {
+            text-align: center;
+            padding: 50px;
+            color: #8a9bb0;
+            font-size: 1rem;
+        }
+
+        /* 车站列表网格 */
+        .station-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .station-tag {
+            background: #f0f4f9;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1a3a5c;
+            border: 1px solid #e0e8f0;
+        }
+
+        /* 车次查询独立表单 */
+        .inline-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .inline-form .form-group {
+            flex: 0 1 auto;
+            min-width: 180px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 700px) {
+            .query-form { flex-direction: column; align-items: stretch; }
+            .search-btn { width: 100%; }
+            .train-table th, .train-table td { padding: 10px 6px; font-size: 0.8rem; }
+            .card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-content">
+        <div class="logo">
+            🚆 MC铁路网
+            <span>幻市铁路局</span>
+        </div>
+        <div class="nav-links">
+            <button class="nav-btn active" data-page="home">🏠 首页</button>
+            <button class="nav-btn" data-page="station">🚉 车站查询</button>
+            <button class="nav-btn" data-page="train">🚆 车次查询</button>
+        </div>
+    </div>
+</div>
+
+<div class="main-container">
+    <!-- 首页：始发站+终点站查询 -->
+    <div id="homePage" class="page active-page">
+        <div class="card">
+            <div class="card-title">📅 车票预订</div>
+            <div class="query-form">
+                <div class="form-group">
+                    <label>🚉 出发站</label>
+                    <select id="fromStation">
+                        <option value="">请选择出发站</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>📍 到达站</label>
+                    <select id="toStation">
+                        <option value="">请选择到达站</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>📆 出发日期</label>
+                    <input type="date" id="travelDate" value="">
+                </div>
+                <button class="search-btn" id="searchTrainsBtn">🔍 查询车次</button>
+            </div>
+
+            <div id="trainResultArea">
+                <div style="text-align:center; padding:40px; color:#8a9bb0;">
+                    ⭐ 请选择始发站和终点站，点击查询
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 车站查询页 -->
+    <div id="stationPage" class="page">
+        <div class="card">
+            <div class="card-title">🚉 车站列表</div>
+            <div class="station-grid" id="stationList"></div>
+            <div style="margin-top: 20px; padding: 16px; background: #f8fafd; border-radius: 16px;">
+                <div style="font-weight: 600; margin-bottom: 8px;">📌 查询提示</div>
+                <div style="font-size: 0.85rem; color: #5b6e8c;">点击上方车站标签可快速填入首页查询框（预留快捷功能）</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 车次查询页（按车次号） -->
+    <div id="trainPage" class="page">
+        <div class="card">
+            <div class="card-title">🚆 车次查询</div>
+            <div class="inline-form">
+                <div class="form-group">
+                    <label>车次号 (如 G888)</label>
+                    <input type="text" id="trainNoInput" placeholder="请输入车次号" autocomplete="off">
+                </div>
+                <button class="search-btn" id="searchByTrainNoBtn">🔍 查询车次</button>
+            </div>
+            <div id="trainByNoResult"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==================== 预留数据库（数据池，后续可批量导入） ====================
+    // 车站数据池
+    let stationsDatabase = [
+        { code: "10001", name: "幻市", pinyin: "Huanshi" },
+        { code: "10002", name: "幻市东", pinyin: "Huanshidong" },
+        { code: "10003", name: "幻市南", pinyin: "Huanshinan" },
+        { code: "10004", name: "幻市西", pinyin: "Huanshixi" },
+        { code: "10005", name: "幻云", pinyin: "Huanyun" },
+        { code: "10086", name: "望京北", pinyin: "Wangjingbei" }
+    ];
+
+    // 车次数据池（预留示例数据，后续可完全替换）
+    let trainsDatabase = [
+        {
+            trainNo: "G1",
+            type: "高铁",
+            startStation: "幻市",
+            endStation: "望京北",
+            startTime: "08:00",
+            endTime: "09:30",
+            duration: "1小时30分",
+            stops: [
+                { station: "幻市", arrive: "--", depart: "08:00", stay: 0 },
+                { station: "幻市南", arrive: "08:35", depart: "08:37", stay: 2 },
+                { station: "望京北站", arrive: "09:30", depart: "--", stay: 0 }
+            ],
+            seats: { business: 12, first: 45, second: 120 }
+        },
+        {
+            trainNo: "D666",
+            type: "动车",
+            startStation: "冰火港站",
+            endStation: "雪落城站",
+            startTime: "09:20",
+            endTime: "11:10",
+            duration: "1小时50分",
+            stops: [
+                { station: "冰火港站", arrive: "--", depart: "09:20", stay: 0 },
+                { station: "幻市站", arrive: "09:55", depart: "09:57", stay: 2 },
+                { station: "雪落城站", arrive: "11:10", depart: "--", stay: 0 }
+            ],
+            seats: { first: 35, second: 88 }
+        },
+        {
+            trainNo: "K1234",
+            type: "快速",
+            startStation: "矿山市站",
+            endStation: "风崖村站",
+            startTime: "13:00",
+            endTime: "17:30",
+            duration: "4小时30分",
+            stops: [
+                { station: "矿山市站", arrive: "--", depart: "13:00", stay: 0 },
+                { station: "幻市站", arrive: "14:50", depart: "15:10", stay: 20 },
+                { station: "风崖村站", arrive: "17:30", depart: "--", stay: 0 }
+            ],
+            seats: { hardSeat: 200, hardSleeper: 60, softSleeper: 24 }
+        }
+    ];
+
+    // ==================== 辅助函数 ====================
+    // 更新车站下拉框
+    function updateStationSelects() {
+        const fromSelect = document.getElementById('fromStation');
+        const toSelect = document.getElementById('toStation');
+        if (!fromSelect || !toSelect) return;
+        
+        let options = '<option value="">请选择出发站</option>';
+        stationsDatabase.forEach(s => { options += `<option value="${s.name}">${s.name}</option>`; });
+        fromSelect.innerHTML = options;
+        
+        let options2 = '<option value="">请选择到达站</option>';
+        stationsDatabase.forEach(s => { options2 += `<option value="${s.name}">${s.name}</option>`; });
+        toSelect.innerHTML = options2;
+    }
+
+    // 渲染车站列表（车站查询页）
+    function renderStationList() {
+        const container = document.getElementById('stationList');
+        if (!container) return;
+        container.innerHTML = '';
+        stationsDatabase.forEach(station => {
+            const tag = document.createElement('div');
+            tag.className = 'station-tag';
+            tag.innerHTML = `🚉 ${station.name} ${station.code ? '('+station.code+')' : ''}`;
+            tag.style.cursor = 'pointer';
+            tag.addEventListener('click', () => {
+                // 快捷填入首页出发站（可选）
+                const fromSel = document.getElementById('fromStation');
+                if(fromSel) fromSel.value = station.name;
+                document.querySelector('[data-page="home"]').click();
+                alert(`已将${station.name}填入出发站，可继续选择到达站查询`);
+            });
+            container.appendChild(tag);
+        });
+    }
+
+    // 区间查询核心逻辑（始发站 -> 终点站）
+    function searchTrainsByStations(start, end) {
+        if (!start || !end) {
+            return { success: false, message: '请选择出发站和到达站' };
+        }
+        if (start === end) {
+            return { success: false, message: '出发站和到达站不能相同' };
+        }
+        // 查找经过 start 且 经过 end 且 start在end之前的车次
+        const results = [];
+        for (const train of trainsDatabase) {
+            const stopNames = train.stops.map(s => s.station);
+            const startIdx = stopNames.indexOf(start);
+            const endIdx = stopNames.indexOf(end);
+            if (startIdx !== -1 && endIdx !== -1 && startIdx < endIdx) {
+                const startStop = train.stops[startIdx];
+                const endStop = train.stops[endIdx];
+                results.push({
+                    trainNo: train.trainNo,
+                    type: train.type,
+                    startStation: start,
+                    endStation: end,
+                    departTime: startStop.depart,
+                    arriveTime: endStop.arrive,
+                    duration: "计算中",   //后续完善
+                    seats: train.seats || {}
+                });
+            }
+        }
+        return { success: true, data: results };
+    }
+
+    // 渲染车次列表 (首页)
+    function renderTrainList(trainsList) {
+        const area = document.getElementById('trainResultArea');
+        if (!area) return;
+        if (!trainsList || trainsList.length === 0) {
+            area.innerHTML = `<div class="empty-msg">😔 未查询到符合条件的车次，请尝试其他车站组合</div>`;
+            return;
+        }
+        let html = `<table class="train-table">
+            <thead>
+                <tr><th>车次</th><th>类型</th><th>出发站</th><th>出发时间</th><th>到达站</th><th>到达时间</th><th>剩余席位</th><th>操作</th></tr>
+            </thead>
+            <tbody>`;
+        for (const t of trainsList) {
+            let seatInfo = '';
+            if (Object.keys(t.seats).length > 0) {
+                let items = [];
+                for (let [k, v] of Object.entries(t.seats)) {
+                    let name = { business:'商务座', first:'一等座', second:'二等座', hardSeat:'硬座', hardSleeper:'硬卧', softSleeper:'软卧' }[k] || k;
+                    items.push(`${name} ${v}张`);
+                }
+                seatInfo = items.join(' / ');
+            } else {
+                seatInfo = '余票充足';
+            }
+            html += `<tr>
+                <td><strong>${escapeHtml(t.trainNo)}</strong></td>
+                <td><span class="badge ${t.type==='高铁'?'badge-g':(t.type==='动车'?'badge-d':'badge-k')}">${escapeHtml(t.type)}</span></td>
+                <td>${escapeHtml(t.startStation)}</td>
+                <td>${escapeHtml(t.departTime)}</td>
+                <td>${escapeHtml(t.endStation)}</td>
+                <td>${escapeHtml(t.arriveTime)}</td>
+                <td style="font-size:0.8rem;">${seatInfo}</td>
+                <td><button class="search-btn" style="padding:6px 16px;font-size:0.75rem;" data-train="${t.trainNo}">查看详情</button></td>
+            </tr>`;
+        }
+        html += `</tbody></table><div style="margin-top:16px; font-size:0.75rem; color:#6c7a8e;">⭐ 数据预览版，后续可导入完整列车时刻</div>`;
+        area.innerHTML = html;
+        // 绑定详情按钮（预留跳转或弹窗）
+        document.querySelectorAll('[data-train]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const trainNo = btn.getAttribute('data-train');
+                alert(`车次 ${trainNo} 详细时刻表功能开发中，后续可查看完整停站信息。`);
+            });
+        });
+    }
+
+    // 按车次号查询
+    function searchTrainByNo(trainNo) {
+        if (!trainNo) return null;
+        const found = trainsDatabase.find(t => t.trainNo.toUpperCase() === trainNo.toUpperCase());
+        return found || null;
+    }
+
+    function renderTrainDetail(train) {
+        const container = document.getElementById('trainByNoResult');
+        if (!container) return;
+        if (!train) {
+            container.innerHTML = `<div class="empty-msg">🚫 未找到该车次，请确认车次号正确</div>`;
+            return;
+        }
+        let stopsHtml = `<table class="train-table" style="margin-top:15px;"><thead><tr><th>车站</th><th>到达时间</th><th>发车时间</th><th>停留时间</th></tr></thead><tbody>`;
+        for (const s of train.stops) {
+            stopsHtml += `<tr><td>${escapeHtml(s.station)}</td><td>${s.arrive}</td><td>${s.depart}</td><td>${s.stay}分钟</td></tr>`;
+        }
+        stopsHtml += `</tbody></table>`;
+        let seatHtml = `<div style="margin-top:16px; background:#f8fafd; padding:12px; border-radius:16px;"><strong>🎫 席位余量</strong><br/>`;
+        for (let [k, v] of Object.entries(train.seats)) {
+            let name = { business:'商务座', first:'一等座', second:'二等座', hardSeat:'硬座', hardSleeper:'硬卧', softSleeper:'软卧' }[k] || k;
+            seatHtml += `<span style="margin-right:20px;">${name}: ${v}张</span>`;
+        }
+        seatHtml += `</div>`;
+        container.innerHTML = `
+            <div style="background:#f0f7fc; border-radius:24px; padding:20px;">
+                <div style="display:flex; justify-content:space-between; flex-wrap:wrap; align-items:center;">
+                    <div><span style="font-size:1.8rem; font-weight:700;">${train.trainNo}</span> <span class="badge badge-g">${train.type}</span></div>
+                    <div>${train.startStation} ${train.startTime} → ${train.endStation} ${train.endTime}  全程 ${train.duration}</div>
+                </div>
+                ${stopsHtml}
+                ${seatHtml}
+            </div>
+        `;
+    }
+
+    // 首页查询事件
+    function handleHomeSearch() {
+        const from = document.getElementById('fromStation').value;
+        const to = document.getElementById('toStation').value;
+        const date = document.getElementById('travelDate').value;
+        if (!from || !to) {
+            alert('请完整选择出发站和到达站');
+            return;
+        }
+        const result = searchTrainsByStations(from, to);
+        if (!result.success) {
+            document.getElementById('trainResultArea').innerHTML = `<div class="empty-msg">⚠️ ${result.message}</div>`;
+        } else {
+            renderTrainList(result.data);
+            if(date) {
+                // 日期提示，后续动态票价可用
+                console.log(`查询日期: ${date}`);
+            }
+        }
+    }
+
+    // 初始化日期默认今天
+    function setDefaultDate() {
+        const dateInput = document.getElementById('travelDate');
+        if(dateInput) {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2,'0');
+            const dd = String(today.getDate()).padStart(2,'0');
+            dateInput.value = `${yyyy}-${mm}-${dd}`;
+        }
+    }
+
+    // 导航切换
+    function initNavigation() {
+        const btns = document.querySelectorAll('.nav-btn');
+        const pages = {
+            home: document.getElementById('homePage'),
+            station: document.getElementById('stationPage'),
+            train: document.getElementById('trainPage')
+        };
+        btns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const pageName = btn.getAttribute('data-page');
+                btns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                Object.values(pages).forEach(p => p.classList.remove('active-page'));
+                if (pageName === 'home') pages.home.classList.add('active-page');
+                if (pageName === 'station') { pages.station.classList.add('active-page'); renderStationList(); }
+                if (pageName === 'train') pages.train.classList.add('active-page');
+            });
+        });
+    }
+
+    function escapeHtml(str) {
+        if(!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if(m === '&') return '&amp;';
+            if(m === '<') return '&lt;';
+            if(m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // ==================== 初始化 ====================
+    window.addEventListener('DOMContentLoaded', () => {
+        updateStationSelects();
+        renderStationList();
+        setDefaultDate();
+        initNavigation();
+
+        // 绑定首页查询按钮
+        const searchBtn = document.getElementById('searchTrainsBtn');
+        if(searchBtn) searchBtn.addEventListener('click', handleHomeSearch);
+
+        // 车次查询页按钮
+        const searchTrainNoBtn = document.getElementById('searchByTrainNoBtn');
+        const trainNoInput = document.getElementById('trainNoInput');
+        if(searchTrainNoBtn) {
+            searchTrainNoBtn.addEventListener('click', () => {
+                const no = trainNoInput.value.trim();
+                if(!no) { alert('请输入车次号'); return; }
+                const train = searchTrainByNo(no);
+                renderTrainDetail(train);
+            });
+        }
+        if(trainNoInput) {
+            trainNoInput.addEventListener('keypress', (e) => {
+                if(e.key === 'Enter') searchTrainNoBtn.click();
+            });
+        }
+
+        // 初始展示首页默认（不查询空状态）
+        document.getElementById('trainResultArea').innerHTML = `<div style="text-align:center; padding:40px; color:#8a9bb0;">✨ 请选择始发站和终点站后点击查询 ✨</div>`;
+        
+        // 预留全局数据库接口 (window.__MCRAILWAY_DB)
+        window.__MCRAILWAY_DB = {
+            stations: stationsDatabase,
+            trains: trainsDatabase,
+            updateStations: (newStations) => { stationsDatabase = newStations; updateStationSelects(); renderStationList(); },
+            updateTrains: (newTrains) => { trainsDatabase = newTrains; },
+            addTrain: (train) => { trainsDatabase.push(train); },
+            addStation: (station) => { stationsDatabase.push(station); updateStationSelects(); renderStationList(); }
+        };
+        console.log('✅ MC铁路网基础框架已加载，可通过 window.__MCRAILWAY_DB 导入数据');
+    });
+</script>
+</body>
+</html>
