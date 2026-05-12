@@ -359,28 +359,46 @@
             type: "高铁",
             startStation: "幻市",
             endStation: "望京北",
-            startTime: "08:00",
+            startTime: "06:00",
             endTime: "09:30",
-            duration: "1小时30分",
+            duration: "3小时30分",
             stops: [
-                { station: "幻市", arrive: "--", depart: "08:00", stay: 0 },
-                { station: "幻市南", arrive: "08:35", depart: "08:37", stay: 2 },
+                { station: "幻市", arrive: "--", depart: "06:00", stay: 0 },
+                { station: "幻市南", arrive: "06:14", depart: "06:19", stay: 5 },
                 { station: "望京北", arrive: "09:30", depart: "--", stay: 0 }
             ],
             seats: { business: 12, first: 45, second: 120 }
         },
-        {
-            trainNo: "D666",
-            type: "动车",
-            startStation: "冰火港站",
-            endStation: "雪落城站",
-            startTime: "09:20",
-            endTime: "11:10",
-            duration: "1小时50分",
+	{
+            trainNo: "G2",
+            type: "高铁",
+            startStation: "望京北",
+            endStation: "幻市",
+            startTime: "10:00",
+            endTime: "13:30",
+            duration: "3小时30分",
             stops: [
-                { station: "冰火港站", arrive: "--", depart: "09:20", stay: 0 },
-                { station: "幻市站", arrive: "09:55", depart: "09:57", stay: 2 },
-                { station: "雪落城站", arrive: "11:10", depart: "--", stay: 0 }
+                { station: "望京北", arrive: "--", depart: "10:00", stay: 0 },
+                { station: "幻市南", arrive: "13:11", depart: "13:16", stay: 5 },
+                { station: "幻市", arrive: "13:30", depart: "--", stay: 0 }
+            ],
+            seats: { business: 12, first: 45, second: 120 }
+        },
+        {
+            trainNo: "D5033",
+            type: "动车",
+            startStation: "幻市",
+            endStation: "望京北",
+            startTime: "6:30",
+            endTime: "15:30",
+            duration: "9小时",
+            stops: [
+                { station: "幻市", arrive: "--", depart: "06:30", stay: 0 },
+                { station: "幻市东", arrive: "06:45", depart: "06:47", stay: 2 },
+                { station: "幻市南", arrive: "07:02", depart: "07:07", stay: 5 },
+		{ station: "幻市西", arrive: "07:22", depart: "07:24", stay: 2 },
+		{ station: "幻云", arrive: "07:39", depart: "07:41", stay: 2 },
+		{ station: "望京北", arrive: "15:30", depart: "--", stay: 0 },
             ],
             seats: { first: 35, second: 88 }
         },
