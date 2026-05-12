@@ -349,7 +349,18 @@
         { code: "10003", name: "幻市南", pinyin: "Huanshinan" },
         { code: "10004", name: "幻市西", pinyin: "Huanshixi" },
         { code: "10005", name: "幻云", pinyin: "Huanyun" },
+        { code: "10006", name: "辞夏北", pinyin: "Cixiabei" },
+        { code: "10007", name: "建州北", pinyin: "Jianzhoubei" },
+        { code: "10008", name: "福瑞机场", pinyin: "Furui Jichang" },
+        { code: "10009", name: "金州西", pinyin: "Jinzhouxi" },
+        { code: "10010", name: "穗州北", pinyin: "Suizhoubei" },
+        { code: "10011", name: "瑞市东", pinyin: "Ruishidong" },
+        { code: "10012", name: "南汇西", pinyin: "Nanhuixi" },
+        { code: "10013", name: "猪市南", pinyin: "Zhushinan" },
+        { code: "10014", name: "猪市东", pinyin: "Zhushidong" },
+        { code: "10015", name: "待确定", pinyin: "Daiqueding" },
         { code: "10086", name: "望京北", pinyin: "Wangjingbei" }
+
     ];
 
     // 车次数据池（预留示例数据，后续可完全替换）
@@ -389,8 +400,26 @@
             type: "动车",
             startStation: "幻市",
             endStation: "望京北",
-            startTime: "6:30",
+            startTime: "06:30",
             endTime: "15:30",
+            duration: "9小时",
+            stops: [
+                { station: "幻市", arrive: "--", depart: "06:30", stay: 0 },
+                { station: "幻市东", arrive: "06:45", depart: "06:47", stay: 2 },
+                { station: "幻市南", arrive: "07:02", depart: "07:07", stay: 5 },
+		{ station: "幻市西", arrive: "07:22", depart: "07:24", stay: 2 },
+		{ station: "幻云", arrive: "07:39", depart: "07:41", stay: 2 },
+		{ station: "望京北", arrive: "15:30", depart: "--", stay: 0 },
+            ],
+            seats: { first: 35, second: 88 }
+        },
+        {
+            trainNo: "D5034",
+            type: "动车",
+            startStation: "望京北",
+            endStation: "幻市",
+            startTime: "16:00",
+            endTime: "01:00(+1)",
             duration: "9小时",
             stops: [
                 { station: "幻市", arrive: "--", depart: "06:30", stay: 0 },
