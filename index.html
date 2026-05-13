@@ -429,7 +429,7 @@
         {
             trainNo: "G1",
             type: "高铁",
-            model: "CR400AF",
+            model: "CR400AF-BZ",
             startStation: "幻市",
             endStation: "望京北",
             startTime: "06:00",
@@ -447,7 +447,7 @@
         {
             trainNo: "G2",
             type: "高铁",
-            model: "CR400AF重联型",
+            model: "CR400AF-BZ",
             startStation: "望京北",
             endStation: "幻市",
             startTime: "10:00",
@@ -565,37 +565,39 @@
         return normalModels.some(nh => model.includes(nh));
     }
     
-    // 获取车次标签HTML（顺序：基础类型 → 复兴号 → 智能动车）
+        // 获取车次标签HTML（顺序：基础类型 → 复兴号 → 智能动车）
     function getTrainBadgeHtml(train) {
         const model = train.model || "";
+        const trainNo = train.trainNo || "";
+        
+        // 判断是否为G字头（高铁）
+        const isGSeries = trainNo.startsWith("G");
+        
+        // 判断是否为C字头（城际）
+        const isCSeries = trainNo.startsWith("C");
         
         // 判断三种属性
         const isSmart = isSmartTrain(model);
         const isFuxingFlag = isFuxing(model);
         const isNormalHighSpeedFlag = isNormalHighSpeed(model);
         
-        // 动车类型（非复兴号、非普通高铁的CRH，以及CR200/CR220/CR300当动车显示）
-        const isNormalElectric = !isFuxingFlag && !isNormalHighSpeedFlag && (model.includes("CRH") || model.includes("CR200") || model.includes("CR220") || model.includes("CR300"));
-        
         let badges = [];
         
         // 1. 基础类型（优先显示）
-        if (isNormalElectric) {
+        if (isGSeries) {
+            // G字头：显示高铁
+            badges.push('<span class="badge badge-g">🚄 高铁</span>');
+        } else if (isCSeries) {
+            // C字头：根据车型判断是高铁还是动车
+            if (isNormalHighSpeedFlag || model.includes("CR400") || model.includes("CR450")) {
+                badges.push('<span class="badge badge-g">🚄 高铁</span>');
+            } else {
+                badges.push('<span class="badge badge-d">🚅 动车</span>');
+            }
+        } else if (trainNo.startsWith("D")) {
             badges.push('<span class="badge badge-d">🚅 动车</span>');
-        } else if (isNormalHighSpeedFlag && !isFuxingFlag) {
-            badges.push('<span class="badge badge-g">🚄 高铁</span>');
-        } else if (isFuxingFlag && !isNormalHighSpeedFlag && !isSmart && (model.includes("CR200") || model.includes("CR220") || model.includes("CR300"))) {
-            // CR200/CR220/CR300：动车基础类型
-            badges.push('<span class="badge badge-d">🚅 动车</span>');
-        } else if (isFuxingFlag && (model.includes("CR400") || model.includes("CR450")) && !isSmart) {
-            // CR400/CR450非智能：高铁基础类型
-            badges.push('<span class="badge badge-g">🚄 高铁</span>');
-        } else if (isSmart) {
-            // 智能动车：基础类型是高铁
-            badges.push('<span class="badge badge-g">🚄 高铁</span>');
-        } else if (!isFuxingFlag && model.includes("CRH380")) {
-            badges.push('<span class="badge badge-g">🚄 高铁</span>');
-        } else if (model.includes("CRH")) {
+        } else {
+            // 其他车次统一显示为动车
             badges.push('<span class="badge badge-d">🚅 动车</span>');
         }
         
@@ -607,10 +609,6 @@
         // 3. 智能动车标签
         if (isSmart) {
             badges.push('<span class="badge badge-smart">✨ 智能动车</span>');
-        }
-        
-        if (badges.length === 0) {
-            badges.push(`<span class="badge badge-c">🚆 ${escapeHtml(train.type)}</span>`);
         }
         
         return badges.join(' ');
