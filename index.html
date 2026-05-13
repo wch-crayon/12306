@@ -421,11 +421,12 @@
         { code: "10086", name: "望京北", pinyin: "Wangjingbei" }
     ];
 
-    // ==================== 车次数据池 ====================
+    // ==================== 车次数据池（带车型字段） ====================
     let trainsDatabase = [
         {
             trainNo: "G1",
             type: "高铁",
+            model: "CR400AF",
             startStation: "幻市",
             endStation: "望京北",
             startTime: "06:00",
@@ -443,6 +444,7 @@
         {
             trainNo: "G2",
             type: "高铁",
+            model: "CR400AF重联型",
             startStation: "望京北",
             endStation: "幻市",
             startTime: "10:00",
@@ -459,6 +461,7 @@
         {
             trainNo: "D5033",
             type: "动车",
+            model: "CRH1B",
             startStation: "幻市",
             endStation: "望京北",
             startTime: "06:30",
@@ -487,6 +490,7 @@
         {
             trainNo: "D5034",
             type: "动车",
+            model: "CRH1B",
             startStation: "望京北",
             endStation: "幻市",
             startTime: "16:00",
@@ -542,7 +546,6 @@
         const wrapper = document.getElementById(wrapperId);
         if (!select || !wrapper) return;
         
-        // 获取所有选项
         const getAllOptions = () => {
             return Array.from(select.options).filter(opt => opt.value).map(opt => ({ value: opt.value, text: opt.text }));
         };
@@ -550,7 +553,6 @@
         let currentValue = select.value;
         let currentText = select.options[select.selectedIndex]?.text || placeholderText;
         
-        // 构建HTML
         wrapper.innerHTML = `
             <div class="custom-select-input" id="${selectId}_input">
                 <span id="${selectId}_display">${currentText}</span>
@@ -625,10 +627,8 @@
         });
         
         dropdown.addEventListener('click', (e) => e.stopPropagation());
-        
         renderOptions('');
         
-        // 监听原生 select 变化
         select.addEventListener('change', () => {
             const selectedOpt = select.options[select.selectedIndex];
             if (selectedOpt && selectedOpt.value) {
@@ -665,7 +665,6 @@
                     select.value = station.name;
                     const changeEvent = new Event('change', { bubbles: true });
                     select.dispatchEvent(changeEvent);
-                    // 同时更新自定义显示
                     const displaySpan = document.getElementById('fromStation_display');
                     if (displaySpan) displaySpan.textContent = station.name;
                 }
@@ -691,6 +690,7 @@
                 results.push({
                     trainNo: train.trainNo,
                     type: train.type,
+                    model: train.model,
                     startStation: start,
                     endStation: end,
                     departTime: startStop.depart,
@@ -709,7 +709,7 @@
             area.innerHTML = `<div class="empty-msg">😔 未查询到符合条件的车次，请尝试其他车站组合</div>`;
             return;
         }
-        let html = `<table class="train-table"><thead><tr><th>车次</th><th>类型</th><th>出发站</th><th>出发时间</th><th>到达站</th><th>到达时间</th><th>剩余席位</th><th>操作</th></tr></thead><tbody>`;
+        let html = `<table class="train-table"><thead><tr><th>车次</th><th>类型</th><th>出发站</th><th>出发时间</th><th>到达站</th><th>到达时间</th><th>剩余席位</th><th>操作</th></thead><tbody>`;
         for (const t of trainsList) {
             let seatInfo = '';
             if (Object.keys(t.seats).length > 0) {
@@ -733,7 +733,7 @@
                 <td><button class="search-btn" style="padding:6px 16px;font-size:0.75rem;" data-train="${t.trainNo}">查看详情</button></td>
             </tr>`;
         }
-        html += `</tbody></table><div style="margin-top:16px; font-size:0.75rem; color:#6c7a8e;">⭐ 点击查看详情可查看完整停站信息</div>`;
+        html += `</tbody></tr><div style="margin-top:16px; font-size:0.75rem; color:#6c7a8e;">⭐ 点击查看详情可查看完整停站信息</div>`;
         area.innerHTML = html;
         document.querySelectorAll('[data-train]').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -752,17 +752,19 @@
     function renderTrainDetail(train) {
         const container = document.getElementById('trainByNoResult');
         if (!container) return;
-        let stopsHtml = `<table class="train-table" style="margin-top:15px;"><thead><tr><th>车站</th><th>到达时间</th><th>发车时间</th><th>停留时间</th></tr></thead><tbody>`;
+        let stopsHtml = `<table class="train-table" style="margin-top:15px;"><thead><tr><th>车站</th><th>到达时间</th><th>发车时间</th><th>停留时间</th></thead><tbody>`;
         for (const s of train.stops) {
             stopsHtml += `<tr><td>${escapeHtml(s.station)}</td><td>${s.arrive}</td><td>${s.depart}</td><td>${s.stay}分钟</td></tr>`;
         }
         stopsHtml += `</tbody></table>`;
+        
         let seatHtml = `<div style="margin-top:16px; background:#f8fafd; padding:12px; border-radius:16px;"><strong>🎫 席位余量</strong><br/>`;
         for (let [k, v] of Object.entries(train.seats)) {
             let name = { business:'商务座', first:'一等座', second:'二等座', hardSeat:'硬座', hardSleeper:'硬卧', softSleeper:'软卧' }[k] || k;
             seatHtml += `<span style="margin-right:20px;">${name}: ${v}张</span>`;
         }
         seatHtml += `</div>`;
+        
         container.innerHTML = `<div style="background:#f0f7fc; border-radius:24px; padding:20px;">
             <div style="display:flex; justify-content:space-between; flex-wrap:wrap; align-items:center;">
                 <div><span style="font-size:1.8rem; font-weight:700;">${train.trainNo}</span> <span class="badge badge-g">${train.type}</span></div>
@@ -770,6 +772,13 @@
             </div>
             ${stopsHtml}
             ${seatHtml}
+            <div style="margin-top: 20px; padding: 16px; background: #eef2f8; border-radius: 20px;">
+                <div style="font-weight: 700; margin-bottom: 10px;">🚆 车型信息</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                    <div><strong>${train.model || '未知'}</strong></div>
+                    <div><img src="${train.model || 'unknown'}.png" alt="${train.model}" style="height: 60px; border-radius: 8px;" onerror="this.style.display='none'"></div>
+                </div>
+            </div>
         </div>`;
     }
 
