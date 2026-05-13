@@ -206,10 +206,13 @@
             border-radius: 20px;
             font-size: 0.75rem;
             font-weight: 600;
+            margin-right: 6px;
         }
-        .badge-g { background: #f3f4f6; color: #374151; }
-        .badge-d { background: #e6f7e6; color: #2e7d32; }
-        .badge-k { background: #fff3e0; color: #e67e22; }
+        .badge-g { background: #dc2626; color: white; }       /* 高铁 - 红色 */
+        .badge-d { background: #059669; color: white; }       /* 动车 - 绿色 */
+        .badge-fx { background: #7c3aed; color: white; }      /* 复兴号 - 紫色 */
+        .badge-smart { background: #ea580c; color: white; }    /* 智能动车 - 橙色 */
+        .badge-c { background: #f39c12; color: white; }        /* 其他 - 橙色 */
 
         .empty-msg {
             text-align: center;
@@ -459,6 +462,23 @@
             seats: { business: 12, first: 45, second: 120 }
         },
         {
+            trainNo: "G3",
+            type: "高铁",
+            model: "CR400AF-Z",
+            startStation: "幻市",
+            endStation: "望京北",
+            startTime: "07:00",
+            endTime: "10:15",
+            duration: "3小时15分",
+            stops: [
+                { station: "幻市", arrive: "--", depart: "07:00", stay: 0 },
+                { station: "幻市南", arrive: "07:14", depart: "07:17", stay: 3 },
+                { station: "猪市东", arrive: "09:04", depart: "09:07", stay: 3 },
+                { station: "望京北", arrive: "10:15", depart: "--", stay: 0 }
+            ],
+            seats: { business: 10, first: 40, second: 100 }
+        },
+        {
             trainNo: "D5033",
             type: "动车",
             model: "CRH1B",
@@ -517,6 +537,84 @@
             seats: { first: 35, second: 88 }
         }
     ];
+
+    // ==================== 车型智能判断函数 ====================
+    // 判断是否为复兴号（CR200, CR220, CR300, CR400, CR450）
+    function isFuxing(model) {
+        if (!model) return false;
+        const fuxingModels = ["CR200", "CR220", "CR300", "CR400", "CR450", "复兴号"];
+        return fuxingModels.some(fx => model.includes(fx));
+    }
+    
+    // 判断是否为智能动车（CR400AF/BF的智能款：C, Z, S, E，以及CR450）
+    function isSmartTrain(model) {
+        if (!model) return false;
+        // CR400系列智能款：-C, -Z, -S, -E
+        if (model.includes("CR400") && (model.includes("-C") || model.includes("-Z") || model.includes("-S") || model.includes("-E"))) {
+            return true;
+        }
+        // CR450系列智能款
+        if (model.includes("CR450")) return true;
+        return false;
+    }
+    
+    // 判断是否为普通高铁（CRH2C, CRH3C, CRH380系列）
+    function isNormalHighSpeed(model) {
+        if (!model) return false;
+        const normalModels = ["CRH2C", "CRH3C", "CRH380"];
+        return normalModels.some(nh => model.includes(nh));
+    }
+    
+    // 获取车次标签HTML（顺序：基础类型 → 复兴号 → 智能动车）
+    function getTrainBadgeHtml(train) {
+        const model = train.model || "";
+        
+        // 判断三种属性
+        const isSmart = isSmartTrain(model);
+        const isFuxingFlag = isFuxing(model);
+        const isNormalHighSpeedFlag = isNormalHighSpeed(model);
+        
+        // 动车类型（非复兴号、非普通高铁的CRH，以及CR200/CR220/CR300当动车显示）
+        const isNormalElectric = !isFuxingFlag && !isNormalHighSpeedFlag && (model.includes("CRH") || model.includes("CR200") || model.includes("CR220") || model.includes("CR300"));
+        
+        let badges = [];
+        
+        // 1. 基础类型（优先显示）
+        if (isNormalElectric) {
+            badges.push('<span class="badge badge-d">🚅 动车</span>');
+        } else if (isNormalHighSpeedFlag && !isFuxingFlag) {
+            badges.push('<span class="badge badge-g">🚄 高铁</span>');
+        } else if (isFuxingFlag && !isNormalHighSpeedFlag && !isSmart && (model.includes("CR200") || model.includes("CR220") || model.includes("CR300"))) {
+            // CR200/CR220/CR300：动车基础类型
+            badges.push('<span class="badge badge-d">🚅 动车</span>');
+        } else if (isFuxingFlag && (model.includes("CR400") || model.includes("CR450")) && !isSmart) {
+            // CR400/CR450非智能：高铁基础类型
+            badges.push('<span class="badge badge-g">🚄 高铁</span>');
+        } else if (isSmart) {
+            // 智能动车：基础类型是高铁
+            badges.push('<span class="badge badge-g">🚄 高铁</span>');
+        } else if (!isFuxingFlag && model.includes("CRH380")) {
+            badges.push('<span class="badge badge-g">🚄 高铁</span>');
+        } else if (model.includes("CRH")) {
+            badges.push('<span class="badge badge-d">🚅 动车</span>');
+        }
+        
+        // 2. 复兴号标签
+        if (isFuxingFlag) {
+            badges.push('<span class="badge badge-fx">🎯 复兴号</span>');
+        }
+        
+        // 3. 智能动车标签
+        if (isSmart) {
+            badges.push('<span class="badge badge-smart">✨ 智能动车</span>');
+        }
+        
+        if (badges.length === 0) {
+            badges.push(`<span class="badge badge-c">🚆 ${escapeHtml(train.type)}</span>`);
+        }
+        
+        return badges.join(' ');
+    }
 
     // ==================== 辅助函数 ====================
     function escapeHtml(str) {
@@ -709,7 +807,7 @@
             area.innerHTML = `<div class="empty-msg">😔 未查询到符合条件的车次，请尝试其他车站组合</div>`;
             return;
         }
-        let html = `<table class="train-table"><thead><tr><th>车次</th><th>类型</th><th>出发站</th><th>出发时间</th><th>到达站</th><th>到达时间</th><th>剩余席位</th><th>操作</th></thead><tbody>`;
+        let html = `<table class="train-table"><thead><tr><th>车次</th><th>类型</th><th>出发站</th><th>出发时间</th><th>到达站</th><th>到达时间</th><th>剩余席位</th><th>操作</th></tr></thead><tbody>`;
         for (const t of trainsList) {
             let seatInfo = '';
             if (Object.keys(t.seats).length > 0) {
@@ -724,7 +822,7 @@
             }
             html += `<tr>
                 <td><strong>${escapeHtml(t.trainNo)}</strong></td>
-                <td><span class="badge ${t.type==='高铁'?'badge-g':'badge-d'}">${escapeHtml(t.type)}</span></td>
+                <td>${getTrainBadgeHtml({ model: t.model, type: t.type })}</td>
                 <td>${escapeHtml(t.startStation)}</td>
                 <td>${escapeHtml(t.departTime)}</td>
                 <td>${escapeHtml(t.endStation)}</td>
@@ -733,7 +831,7 @@
                 <td><button class="search-btn" style="padding:6px 16px;font-size:0.75rem;" data-train="${t.trainNo}">查看详情</button></td>
             </tr>`;
         }
-        html += `</tbody></tr><div style="margin-top:16px; font-size:0.75rem; color:#6c7a8e;">⭐ 点击查看详情可查看完整停站信息</div>`;
+        html += `</tbody></table><div style="margin-top:16px; font-size:0.75rem; color:#6c7a8e;">⭐ 点击查看详情可查看完整停站信息</div>`;
         area.innerHTML = html;
         document.querySelectorAll('[data-train]').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -767,16 +865,16 @@
         
         container.innerHTML = `<div style="background:#f0f7fc; border-radius:24px; padding:20px;">
             <div style="display:flex; justify-content:space-between; flex-wrap:wrap; align-items:center;">
-                <div><span style="font-size:1.8rem; font-weight:700;">${train.trainNo}</span> <span class="badge badge-g">${train.type}</span></div>
+                <div><span style="font-size:1.8rem; font-weight:700;">${train.trainNo}</span> ${getTrainBadgeHtml(train)}</div>
                 <div>${train.startStation} ${train.startTime} → ${train.endStation} ${train.endTime}  全程 ${train.duration}</div>
             </div>
             ${stopsHtml}
             ${seatHtml}
             <div style="margin-top: 20px; padding: 16px; background: #eef2f8; border-radius: 20px;">
                 <div style="font-weight: 700; margin-bottom: 10px;">🚆 车型信息</div>
-                <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
-                    <div><strong>${train.model || '未知'}</strong></div>
-                    <div><img src="${train.model || 'unknown'}.png" alt="${train.model}" style="height: 60px; border-radius: 8px;" onerror="this.style.display='none'"></div>
+                <div style="margin-bottom: 12px;"><strong>${train.model || '未知'}</strong></div>
+                <div style="text-align: center;">
+                    <img src="${train.model || 'unknown'}.png" alt="${train.model}" style="max-width: 100%; border-radius: 12px;" onerror="this.style.display='none'">
                 </div>
             </div>
         </div>`;
