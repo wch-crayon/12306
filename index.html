@@ -822,8 +822,8 @@
                 seatInfo = '余票充足';
             }
             html += `<tr>
-                <td><strong>${escapeHtml(t.trainNo)}</strong></td>
-                <td>${getTrainBadgeHtml({ model: t.model, type: t.type })}</td>
+    		<td><strong>${escapeHtml(t.trainNo)}</strong></td>
+    		<td>${getTrainBadgeHtml({ model: t.model, type: t.type, trainNo: t.trainNo })}</td>
                 <td>${escapeHtml(t.startStation)}</td>
                 <td>${escapeHtml(t.departTime)}</td>
                 <td>${escapeHtml(t.endStation)}</td>
