@@ -546,14 +546,16 @@
         return fuxingModels.some(fx => model.includes(fx));
     }
     
-    // 判断是否为智能动车（CR400AF/BF的智能款：C, Z, S, E，以及CR450）
+    // 判断是否为智能动车
     function isSmartTrain(model) {
         if (!model) return false;
-        // CR400系列智能款：-C, -Z, -S, -E
-        if (model.includes("CR400") && (model.includes("-C") || model.includes("-Z") || model.includes("-S") || model.includes("-E"))) {
-            return true;
+        // CR400系列：带 -C 算智能，或者带 S/E/Z（无减号）算智能
+        if (model.includes("CR400")) {
+            if (model.includes("-C")) return true;
+            if (model.includes("S") || model.includes("E") || model.includes("Z")) return true;
+            return false;
         }
-        // CR450系列智能款
+        // CR450系列：全部都是智能
         if (model.includes("CR450")) return true;
         return false;
     }
