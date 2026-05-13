@@ -295,6 +295,48 @@
             font-family: inherit;
             background: white;
             cursor: pointer;
+        }        /* 可搜索下拉框样式 */
+        .searchable-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-family: inherit;
+            background: white;
+            cursor: pointer;
+        }
+        
+        /* 自定义下拉选项样式 */
+        .select-search-input {
+            width: calc(100% - 20px);
+            margin: 8px 10px;
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+        }
+        
+        .select-search-input:focus {
+            outline: none;
+            border-color: #1a6fa8;
+            box-shadow: 0 0 0 2px rgba(26,111,168,0.1);
+        }
+        
+        .select-option {
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .select-option:hover {
+            background-color: #eef2f8;
+        }
+        
+        .select-option.selected {
+            background-color: #1a6fa8;
+            color: white;
         }        
     </style>
 </head>
@@ -851,10 +893,127 @@
             return m;
         });
     }
+    // 让普通 select 变成下拉框带搜索
+    function enhanceSelectWithSearch(selectId) {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        
+        // 保存原始选项
+        const originalOptions = Array.from(select.options).map(opt => ({
+            value: opt.value,
+            text: opt.text
+        }));
+        
+        // 隐藏原始 select
+        select.style.display = 'none';
+        
+        // 创建自定义下拉组件
+        const wrapper = document.createElement('div');
+        wrapper.style.position = 'relative';
+        wrapper.style.width = '100%';
+        
+        // 显示框（显示当前选中的值）
+        const displayInput = document.createElement('div');
+        displayInput.style.cssText = 'width:100%; padding:12px 15px; border:1px solid #cbd5e1; border-radius:16px; font-size:1rem; background:white; cursor:pointer; box-sizing:border-box; display:flex; justify-content:space-between; align-items:center;';
+        displayInput.innerHTML = '<span id="displayText_' + selectId + '">请选择出发站</span><span>▼</span>';
+        
+        // 下拉面板
+        const dropdown = document.createElement('div');
+        dropdown.style.cssText = 'position:absolute; top:100%; left:0; right:0; background:white; border:1px solid #cbd5e1; border-radius:16px; max-height:280px; overflow-y:auto; z-index:100; display:none; box-shadow:0 4px 12px rgba(0,0,0,0.1);';
+        
+        // 搜索输入框
+        const searchInput = document.createElement('input');
+        searchInput.type = 'text';
+        searchInput.placeholder = '🔍 搜索车站...';
+        searchInput.className = 'select-search-input';
+        
+        // 选项容器
+        const optionsContainer = document.createElement('div');
+        optionsContainer.style.maxHeight = '220px';
+        optionsContainer.style.overflowY = 'auto';
+        
+        dropdown.appendChild(searchInput);
+        dropdown.appendChild(optionsContainer);
+        
+        wrapper.appendChild(displayInput);
+        wrapper.appendChild(dropdown);
+        select.parentNode.insertBefore(wrapper, select);
+        wrapper.appendChild(select);
+        
+        // 更新选项列表
+        function updateOptions(filterText = '') {
+            const kw = filterText.trim().toLowerCase();
+            const filtered = originalOptions.filter(opt => 
+                opt.value === '' || (opt.text && opt.text.toLowerCase().includes(kw))
+            );
+            
+            optionsContainer.innerHTML = '';
+            
+            if (filtered.length === 0) {
+                optionsContainer.innerHTML = '<div style="padding:12px; text-align:center; color:#999;">未找到匹配车站</div>';
+                return;
+            }
+            
+            filtered.forEach(opt => {
+                const optionDiv = document.createElement('div');
+                optionDiv.textContent = opt.text;
+                optionDiv.className = 'select-option';
+                if (select.value === opt.value) {
+                    optionDiv.classList.add('selected');
+                }
+                optionDiv.onclick = () => {
+                    select.value = opt.value;
+                    const displaySpan = document.getElementById('displayText_' + selectId);
+                    if (displaySpan) displaySpan.textContent = opt.text || '请选择';
+                    dropdown.style.display = 'none';
+                    // 触发 change 事件
+                    const event = new Event('change', { bubbles: true });
+                    select.dispatchEvent(event);
+                };
+                optionsContainer.appendChild(optionDiv);
+            });
+        }
+        
+        // 显示/隐藏下拉面板
+        displayInput.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isVisible = dropdown.style.display === 'block';
+            dropdown.style.display = isVisible ? 'none' : 'block';
+            if (!isVisible) {
+                searchInput.value = '';
+                updateOptions('');
+                searchInput.focus();
+            }
+        });
+        
+        // 搜索输入事件
+        searchInput.addEventListener('input', () => {
+            updateOptions(searchInput.value);
+        });
+        
+        // 点击其他地方隐藏
+        document.addEventListener('click', () => {
+            dropdown.style.display = 'none';
+        });
+        
+        // 初始化显示文本
+        const initialOpt = originalOptions.find(opt => opt.value === select.value) || originalOptions[0];
+        const displaySpan = document.getElementById('displayText_' + selectId);
+        if (displaySpan && initialOpt) displaySpan.textContent = initialOpt.text;
+        
+        // 监听 select 变化同步显示
+        select.addEventListener('change', () => {
+            const selected = originalOptions.find(opt => opt.value === select.value);
+            const displaySpan = document.getElementById('displayText_' + selectId);
+            if (displaySpan && selected) displaySpan.textContent = selected.text;
+        });
+    }
 
     // ==================== 初始化 ====================
 
     window.addEventListener('DOMContentLoaded', () => {
+        enhanceSelectWithSearch('fromStation');
+        enhanceSelectWithSearch('toStation');
         makeSelectSearchable('fromStation');
         makeSelectSearchable('toStation');
         updateStationSelects();
