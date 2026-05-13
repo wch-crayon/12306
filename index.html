@@ -284,6 +284,17 @@
         }
         .form-group {
                 position: relative;
+        }
+        /* 可搜索下拉框样式 */
+        .searchable-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-family: inherit;
+            background: white;
+            cursor: pointer;
         }        
     </style>
 </head>
@@ -312,15 +323,15 @@
                 <!-- 首页“车票预订”里的出发站/到达站，替换原来的 select -->
                 <div class="form-group">
                     <label>🚉 出发站</label>
-                    <input type="text" id="fromStationInput" placeholder="输入站名搜索" autocomplete="off" style="width:100%; padding:12px 15px; border-radius:16px; border:1px solid #cbd5e1;">
-                    <select id="fromStation" style="display:none;"></select>
-                    <div id="fromStationSuggestions" class="station-suggestions"></div>
+                    <select id="fromStation" class="searchable-select">
+                        <option value="">请选择出发站</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>📍 到达站</label>
-                    <input type="text" id="toStationInput" placeholder="输入站名搜索" autocomplete="off" style="width:100%; padding:12px 15px; border-radius:16px; border:1px solid #cbd5e1;">
-                    <select id="toStation" style="display:none;"></select>
-                    <div id="toStationSuggestions" class="station-suggestions"></div>
+                    <select id="toStation" class="searchable-select">
+                        <option value="">请选择到达站</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>📆 出发日期</label>
@@ -566,6 +577,100 @@
             container.appendChild(tag);
         });
     }
+    // 让普通 select 变成可搜索的下拉框
+    function makeSelectSearchable(selectId) {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        
+        // 保存原始选项
+        const originalOptions = Array.from(select.options).map(opt => ({
+            value: opt.value,
+            text: opt.text
+        }));
+        
+        // 创建包装容器
+        const wrapper = document.createElement('div');
+        wrapper.style.position = 'relative';
+        wrapper.style.width = '100%';
+        
+        // 创建输入框
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = '输入站名搜索或点击选择';
+        input.style.cssText = 'width:100%; padding:12px 15px; border:1px solid #cbd5e1; border-radius:16px; font-size:1rem; box-sizing:border-box;';
+        input.autocomplete = 'off';
+        
+        // 创建下拉列表容器
+        const dropdown = document.createElement('div');
+        dropdown.style.cssText = 'position:absolute; top:100%; left:0; right:0; background:white; border:1px solid #cbd5e1; border-radius:16px; max-height:200px; overflow-y:auto; z-index:100; display:none; box-shadow:0 4px 12px rgba(0,0,0,0.1);';
+        
+        // 隐藏原始 select
+        select.style.display = 'none';
+        select.parentNode.insertBefore(wrapper, select);
+        wrapper.appendChild(input);
+        wrapper.appendChild(dropdown);
+        wrapper.appendChild(select);
+        
+        // 更新下拉列表
+        function updateDropdown(filterText = '') {
+            const kw = filterText.trim().toLowerCase();
+            const filtered = originalOptions.filter(opt => 
+                opt.value === '' || (opt.text && opt.text.toLowerCase().includes(kw))
+            );
+            
+            if (filtered.length === 0) {
+                dropdown.innerHTML = '<div style="padding:12px; color:#999; text-align:center;">未找到匹配车站</div>';
+                return;
+            }
+            
+            dropdown.innerHTML = '';
+            filtered.forEach(opt => {
+                const item = document.createElement('div');
+                item.textContent = opt.text || opt.value;
+                item.style.cssText = 'padding:10px 15px; cursor:pointer; font-size:0.9rem;';
+                item.onmouseenter = () => item.style.backgroundColor = '#eef2f8';
+                item.onmouseleave = () => item.style.backgroundColor = '';
+                item.onclick = () => {
+                    input.value = opt.text;
+                    select.value = opt.value;
+                    dropdown.style.display = 'none';
+                    // 触发 change 事件
+                    const event = new Event('change', { bubbles: true });
+                    select.dispatchEvent(event);
+                };
+                dropdown.appendChild(item);
+            });
+        }
+        
+        // 输入事件
+        input.addEventListener('input', () => {
+            updateDropdown(input.value);
+            dropdown.style.display = 'block';
+        });
+        
+        // 点击输入框显示下拉
+        input.addEventListener('click', () => {
+            updateDropdown(input.value);
+            dropdown.style.display = 'block';
+        });
+        
+        // 点击其他地方隐藏下拉
+        document.addEventListener('click', (e) => {
+            if (!wrapper.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+        
+        // 初始化显示第一个选项的文字
+        const defaultOpt = originalOptions.find(opt => opt.value === select.value) || originalOptions[0];
+        if (defaultOpt) input.value = defaultOpt.text;
+        
+        // 监听 select 变化同步输入框
+        select.addEventListener('change', () => {
+            const selected = originalOptions.find(opt => opt.value === select.value);
+            if (selected) input.value = selected.text;
+        });
+    }
 
     // 区间查询核心逻辑（始发站 -> 终点站）
     function searchTrainsByStations(start, end) {
@@ -748,7 +853,10 @@
     }
 
     // ==================== 初始化 ====================
+
     window.addEventListener('DOMContentLoaded', () => {
+        makeSelectSearchable('fromStation');
+        makeSelectSearchable('toStation');
         updateStationSelects();
         renderStationList();
         setDefaultDate();
