@@ -261,6 +261,30 @@
             .train-table th, .train-table td { padding: 10px 6px; font-size: 0.8rem; }
             .card { padding: 20px; }
         }
+        /* 新增：车站搜索下拉建议框样式 */
+        .station-suggestions {
+                position: absolute;
+                background: white;
+                border: 1px solid #cbd5e1;
+                border-radius: 16px;
+                max-height: 200px;
+                overflow-y: auto;
+                z-index: 100;
+                width: calc(100% - 0px);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                display: none;
+        }
+        .station-suggestions div {
+                padding: 10px 15px;
+                cursor: pointer;
+                font-size: 0.9rem;
+        }
+        .station-suggestions div:hover {
+                background: #eef2f8;
+        }
+        .form-group {
+                position: relative;
+        }        
     </style>
 </head>
 <body>
@@ -285,17 +309,18 @@
         <div class="card">
             <div class="card-title">📅 车票预订</div>
             <div class="query-form">
+                <!-- 首页“车票预订”里的出发站/到达站，替换原来的 select -->
                 <div class="form-group">
                     <label>🚉 出发站</label>
-                    <select id="fromStation">
-                        <option value="">请选择出发站</option>
-                    </select>
+                    <input type="text" id="fromStationInput" placeholder="输入站名搜索" autocomplete="off" style="width:100%; padding:12px 15px; border-radius:16px; border:1px solid #cbd5e1;">
+                    <select id="fromStation" style="display:none;"></select>
+                    <div id="fromStationSuggestions" class="station-suggestions"></div>
                 </div>
                 <div class="form-group">
                     <label>📍 到达站</label>
-                    <select id="toStation">
-                        <option value="">请选择到达站</option>
-                    </select>
+                    <input type="text" id="toStationInput" placeholder="输入站名搜索" autocomplete="off" style="width:100%; padding:12px 15px; border-radius:16px; border:1px solid #cbd5e1;">
+                    <select id="toStation" style="display:none;"></select>
+                    <div id="toStationSuggestions" class="station-suggestions"></div>
                 </div>
                 <div class="form-group">
                     <label>📆 出发日期</label>
@@ -316,6 +341,10 @@
     <div id="stationPage" class="page">
         <div class="card">
             <div class="card-title">🚉 车站列表</div>
+                <!-- 车站查询页面，在 card-title 下面增加搜索框 -->
+                <div style="margin-bottom: 20px;">
+                    <input type="text" id="stationSearchInput" placeholder="🔍 输入站名搜索" style="width:100%; padding:12px 15px; border-radius:40px; border:1px solid #cbd5e1;">
+                </div>
             <div class="station-grid" id="stationList"></div>
             <div style="margin-top: 20px; padding: 16px; background: #f8fafd; border-radius: 16px;">
                 <div style="font-weight: 600; margin-bottom: 8px;">📌 查询提示</div>
@@ -377,7 +406,8 @@
             stops: [
                 { station: "幻市", arrive: "--", depart: "06:00", stay: 0 },
                 { station: "幻市南", arrive: "06:14", depart: "06:19", stay: 5 },
-                { station: "猪市东", arrive: "07:19", depart: "07:23", stay: 4 },
+                { station: "金州西", arrive: "07:19", depart: "07:22", stay: 3 },
+                { station: "猪市东", arrive: "08:04", depart: "08:08", stay: 4 },
                 { station: "望京北", arrive: "09:30", depart: "--", stay: 0 }
             ],
             seats: { business: 12, first: 45, second: 120 }
@@ -447,10 +477,10 @@
                 { station: "建州北", arrive: "23:05", depart: "23:07", stay: 2 },                
                 { station: "辞夏北", arrive: "23:27", depart: "23:29", stay: 2 },                
                 { station: "幻云", arrive: "23:49", depart: "23:51", stay: 2 },                
-                { station: "幻市西", arrive: "00:06", depart: "00:08", stay: 2 },                
-                { station: "幻市南", arrive: "00:23", depart: "00:28", stay: 5 },                
-                { station: "幻市东", arrive: "00:43", depart: "00:45", stay: 2 },                
-                { station: "幻市", arrive: "01:00", depart: "--", stay: 0 }
+                { station: "幻市西", arrive: "00:06(+1)", depart: "00:08(+1)", stay: 2 },                
+                { station: "幻市南", arrive: "00:23(+1)", depart: "00:28(+1)", stay: 5 },                
+                { station: "幻市东", arrive: "00:43(+1)", depart: "00:45(+1)", stay: 2 },                
+                { station: "幻市", arrive: "01:00(+1)", depart: "--", stay: 0 }
             ],
             seats: { first: 35, second: 88 }
         },
@@ -503,6 +533,35 @@
                 if(fromSel) fromSel.value = station.name;
                 document.querySelector('[data-page="home"]').click();
                 alert(`已将${station.name}填入出发站，可继续选择到达站查询`);
+            });
+            container.appendChild(tag);
+        });
+    }
+        function renderStationList(keyword = '') {
+        const container = document.getElementById('stationList');
+        if (!container) return;
+        
+        let filtered = stationsDatabase;
+        if (keyword.trim()) {
+            const kw = keyword.trim().toLowerCase();
+            filtered = stationsDatabase.filter(s => s.name.toLowerCase().includes(kw));
+        }
+        
+        container.innerHTML = '';
+        if (filtered.length === 0) {
+            container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px;">😔 未找到匹配的车站</div>';
+            return;
+        }
+        
+        filtered.forEach(station => {
+            const tag = document.createElement('div');
+            tag.className = 'station-tag';
+            tag.innerHTML = `🚉 ${station.name}`;
+            tag.style.cursor = 'pointer';
+            tag.addEventListener('click', () => {
+                const fromInput = document.getElementById('fromStationInput');
+                if (fromInput) fromInput.value = station.name;
+                document.querySelector('[data-page="home"]').click();
             });
             container.appendChild(tag);
         });
