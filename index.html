@@ -214,12 +214,12 @@
             font-weight: 600;
             margin-right: 6px;
         }
-        .badge-g { background: #dc2626; color: white; }
-        .badge-d { background: #059669; color: white; }
-        .badge-fx { background: #7c3aed; color: white; }
-        .badge-smart { background: #ea580c; color: white; }
-        .badge-dj { background: #8b5cf6; color: white; }
-        .badge-c { background: #f39c12; color: white; }
+        .badge-g { background: #f97316; color: white; }       /* 高铁 - 橙色 */
+        .badge-d { background: #059669; color: white; }       /* 动车 - 绿色 */
+        .badge-fx { background: #dc2626; color: white; }      /* 复兴号 - 红色 */
+        .badge-smart { background: #3b82f6; color: white; }   /* 智能动车 - 浅蓝 */
+        .badge-dj { background: #eab308; color: #422006; }    /* 动检 - 黄色 */
+        .badge-c { background: #f39c12; color: white; }       /* 其他 - 橙色 */
 
         .empty-msg {
             text-align: center;
@@ -451,12 +451,12 @@
         
         let badges = [];
         
-        // 动检车特殊处理
+        // 动检车特殊处理（先加动检标签）
         if (isDJSeries) {
             badges.push('<span class="badge badge-dj">✂️ 动检</span>');
-            return badges.join(' ');
         }
         
+        // 基础类型
         if (isGSeries) {
             badges.push('<span class="badge badge-g">🚄 高铁</span>');
         } else if (isCSeries) {
@@ -467,14 +467,16 @@
             }
         } else if (trainNo.startsWith("D")) {
             badges.push('<span class="badge badge-d">🚅 动车</span>');
-        } else {
+        } else if (!isDJSeries) {
             badges.push('<span class="badge badge-d">🚅 动车</span>');
         }
         
+        // 复兴号标签（动检车也加）
         if (isFuxingFlag) {
             badges.push('<span class="badge badge-fx">🎯 复兴号</span>');
         }
         
+        // 智能动车标签
         if (isSmart) {
             badges.push('<span class="badge badge-smart">✨ 智能动车</span>');
         }
