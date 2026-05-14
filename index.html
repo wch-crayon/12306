@@ -552,7 +552,7 @@
                     const cityStations = stationsDatabase.filter(s => s.city === city);
                     cityOptions.push({
                         value: `CITY_${city}`,
-                        text: `🏙️ ${city}（${cityStations.length}个站）`,
+                        text: `🏙️ ${city}<span style="font-size:0.7rem; color:#8a9bb0;">(城市)</span>（${cityStations.length}个站）`,
                         isCity: true,
                         cityName: city
                     });
@@ -560,7 +560,11 @@
                 
                 matchedStations.forEach(station => {
                     if (!cityOptions.some(co => co.cityName === station.city)) {
-                        stationOptions.push({ value: station.name, text: station.name, isCity: false });
+                        stationOptions.push({ 
+                            value: station.name, 
+                            text: `🚉 ${station.name}<span style="font-size:0.7rem; color:#8a9bb0;">(车站)</span>`, 
+                            isCity: false 
+                        });
                     }
                 });
                 
@@ -572,8 +576,8 @@
                 }
                 
                 optionsContainer.innerHTML = allOptions.map(opt => `
-                    <div class="custom-select-option ${opt.value === currentValue ? 'selected' : ''}" data-value="${opt.value}" data-text="${opt.text}" data-iscity="${opt.isCity || false}" data-cityname="${opt.cityName || ''}">
-                        ${escapeHtml(opt.text)}
+                    <div class="custom-select-option ${opt.value === currentValue ? 'selected' : ''}" data-value="${opt.value}" data-text="${opt.text.replace(/<[^>]*>/g, '')}" data-iscity="${opt.isCity || false}" data-cityname="${opt.cityName || ''}">
+                        ${opt.text}
                     </div>
                 `).join('');
                 
@@ -698,14 +702,27 @@
         if (isCitySearch) {
             const cityHeader = document.createElement('div');
             cityHeader.className = 'city-header';
-            cityHeader.innerHTML = `🏙️ ${cityName}（共${filtered.length}个车站）`;
+            cityHeader.innerHTML = `🏙️ ${cityName}<span style="font-size:0.7rem; color:#8a9bb0;">(城市)</span>（共${filtered.length}个车站）`;
             container.appendChild(cityHeader);
         }
         
         filtered.forEach(station => {
             const tag = document.createElement('div');
             tag.className = 'station-tag';
-            tag.innerHTML = `🚉 ${station.name}`;
+            
+            if (isCitySearch) {
+                tag.innerHTML = `🚉 ${station.name}<span style="font-size:0.7rem; color:#8a9bb0; margin-left:6px;">(车站)</span>`;
+            } else {
+                const isCityMatch = keyword.trim() && station.city && station.city.toLowerCase().includes(keyword.trim().toLowerCase());
+                if (isCityMatch && station.name !== station.city) {
+                    tag.innerHTML = `🚉 ${station.name}<span style="font-size:0.7rem; color:#8a9bb0; margin-left:6px;">(${station.city}·车站)</span>`;
+                } else if (station.name === keyword.trim()) {
+                    tag.innerHTML = `🚉 ${station.name}<span style="font-size:0.7rem; color:#8a9bb0; margin-left:6px;">(车站)</span>`;
+                } else {
+                    tag.innerHTML = `🚉 ${station.name}`;
+                }
+            }
+            
             tag.addEventListener('click', () => {
                 const select = document.getElementById('fromStation');
                 if (select) {
