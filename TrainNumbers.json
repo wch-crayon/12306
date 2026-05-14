@@ -3,11 +3,12 @@
         "trainNo": "G1",
         "type": "高铁",
         "model": "CR400AF-BS",
+        "depot": "幻市局",
         "startStation": "幻市",
         "endStation": "齐河北",
         "startTime": "06:00",
-        "endTime": "09:31",
-        "duration": "3小时31分",
+        "endTime": "09:23",
+        "duration": "3小时23分",
         "stops": [
             { "station": "幻市", "arrive": "--", "depart": "06:00", "stay": 0 },
             { "station": "幻市南", "arrive": "06:14", "depart": "06:19", "stay": 5 },
@@ -15,39 +16,43 @@
             { "station": "猪市东", "arrive": "08:04", "depart": "08:08", "stay": 4 },
             { "station": "天海西", "arrive": "08:34", "depart": "08:37", "stay": 3 },
             { "station": "望京北", "arrive": "09:12", "depart": "09:16", "stay": 4 },
-            { "station": "齐河北", "arrive": "09:31", "depart": "--", "stay": 0 }
+            { "station": "齐河北", "arrive": "09:23", "depart": "--", "stay": 0 }
         ],
-        "seats": { "business": 12, "first": 45, "second": 120 }
+        "seats": { "business": 12, "first": 45, "second": 120 },
+        "funFacts": []
     },
     {
         "trainNo": "G2",
         "type": "高铁",
         "model": "CR400AF-BS",
+        "depot": "幻市局",
         "startStation": "齐河北",
         "endStation": "幻市",
         "startTime": "10:00",
-        "endTime": "13:31",
-        "duration": "3小时31分",
+        "endTime": "13:23",
+        "duration": "3小时23分",
         "stops": [
             { "station": "齐河北", "arrive": "--", "depart": "10:00", "stay": 0 },
-            { "station": "望京北", "arrive": "10:15", "depart": "10:19", "stay": 4 },
-            { "station": "天海西", "arrive": "10:54", "depart": "10:57", "stay": 3 },
-            { "station": "猪市东", "arrive": "11:23", "depart": "11:27", "stay": 4 },
-            { "station": "金州西", "arrive": "12:09", "depart": "12:12", "stay": 3 },
-            { "station": "幻市南", "arrive": "13:12", "depart": "13:17", "stay": 5 },
-            { "station": "幻市", "arrive": "13:31", "depart": "--", "stay": 0 }
+            { "station": "望京北", "arrive": "10:07", "depart": "10:11", "stay": 4 },
+            { "station": "天海西", "arrive": "10:46", "depart": "10:49", "stay": 3 },
+            { "station": "猪市东", "arrive": "11:15", "depart": "11:19", "stay": 4 },
+            { "station": "金州西", "arrive": "12:01", "depart": "12:04", "stay": 3 },
+            { "station": "幻市南", "arrive": "13:04", "depart": "13:09", "stay": 5 },
+            { "station": "幻市", "arrive": "13:23", "depart": "--", "stay": 0 }
         ],
-        "seats": { "business": 12, "first": 45, "second": 120 }
+        "seats": { "business": 12, "first": 45, "second": 120 },
+        "funFacts": []
     },
     {
         "trainNo": "G3",
         "type": "高铁",
         "model": "CR400BF-AS",
+        "depot": "幻市局",
         "startStation": "幻市",
         "endStation": "齐河北",
         "startTime": "06:30",
-        "endTime": "10:01",
-        "duration": "3小时31分",
+        "endTime": "09:53",
+        "duration": "3小时23分",
         "stops": [
             { "station": "幻市", "arrive": "--", "depart": "06:30", "stay": 0 },
             { "station": "幻市南", "arrive": "06:44", "depart": "06:49", "stay": 5 },
@@ -55,64 +60,72 @@
             { "station": "猪市东", "arrive": "08:34", "depart": "08:38", "stay": 4 },
             { "station": "天海西", "arrive": "09:04", "depart": "09:07", "stay": 3 },
             { "station": "望京北", "arrive": "09:42", "depart": "09:46", "stay": 4 },
-            { "station": "齐河北", "arrive": "10:01", "depart": "--", "stay": 0 }
+            { "station": "齐河北", "arrive": "09:53", "depart": "--", "stay": 0 }
         ],
-        "seats": { "business": 10, "first": 40, "second": 100 }
+        "seats": { "business": 10, "first": 40, "second": 100 },
+        "funFacts": []
     },
     {
         "trainNo": "G4",
         "type": "高铁",
         "model": "CR400BF-AS",
+        "depot": "幻市局",
         "startStation": "齐河北",
         "endStation": "幻市",
         "startTime": "10:30",
-        "endTime": "14:01",
-        "duration": "3小时31分",
+        "endTime": "13:53",
+        "duration": "3小时23分",
         "stops": [
             { "station": "齐河北", "arrive": "--", "depart": "10:30", "stay": 0 },
-            { "station": "望京北", "arrive": "10:45", "depart": "10:49", "stay": 4 },
-            { "station": "天海西", "arrive": "11:24", "depart": "11:27", "stay": 3 },
-            { "station": "猪市东", "arrive": "11:53", "depart": "11:57", "stay": 4 },
-            { "station": "福瑞机场", "arrive": "12:44", "depart": "12:47", "stay": 3 },
-            { "station": "幻市南", "arrive": "13:42", "depart": "13:47", "stay": 5 },
-            { "station": "幻市", "arrive": "14:01", "depart": "--", "stay": 0 }
+            { "station": "望京北", "arrive": "10:37", "depart": "10:41", "stay": 4 },
+            { "station": "天海西", "arrive": "11:16", "depart": "11:19", "stay": 3 },
+            { "station": "猪市东", "arrive": "11:45", "depart": "11:49", "stay": 4 },
+            { "station": "福瑞机场", "arrive": "12:36", "depart": "12:39", "stay": 3 },
+            { "station": "幻市南", "arrive": "13:34", "depart": "13:39", "stay": 5 },
+            { "station": "幻市", "arrive": "13:53", "depart": "--", "stay": 0 }
         ],
-        "seats": { "business": 10, "first": 40, "second": 100 }
+        "seats": { "business": 10, "first": 40, "second": 100 },
+        "funFacts": []
     },
     {
         "trainNo": "C101",
         "type": "高铁",
         "model": "CR400AF-Z",
+        "depot": "猪市局",
         "startStation": "猪市东",
         "endStation": "齐河北",
         "startTime": "08:00",
-        "endTime": "09:23",
-        "duration": "1小时23分",
+        "endTime": "09:08",
+        "duration": "1小时08分",
         "stops": [
             { "station": "猪市东", "arrive": "--", "depart": "08:00", "stay": 0 },
-            { "station": "齐河北", "arrive": "09:23", "depart": "--", "stay": 0 }
+            { "station": "齐河北", "arrive": "09:08", "depart": "--", "stay": 0 }
         ],
-        "seats": { "business": 12, "first": 45, "second": 120 }
+        "seats": { "business": 12, "first": 45, "second": 120 },
+        "funFacts": []
     },
     {
         "trainNo": "C102",
         "type": "高铁",
         "model": "CR400AF-Z",
+        "depot": "猪市局",
         "startStation": "齐河北",
         "endStation": "猪市东",
         "startTime": "09:40",
-        "endTime": "11:03",
-        "duration": "1小时23分",
+        "endTime": "10:48",
+        "duration": "1小时08分",
         "stops": [
             { "station": "齐河北", "arrive": "--", "depart": "09:40", "stay": 0 },
-            { "station": "猪市东", "arrive": "11:03", "depart": "--", "stay": 0 }
+            { "station": "猪市东", "arrive": "10:48", "depart": "--", "stay": 0 }
         ],
-        "seats": { "business": 12, "first": 45, "second": 120 }
+        "seats": { "business": 12, "first": 45, "second": 120 },
+        "funFacts": []
     },
     {
         "trainNo": "D5033",
         "type": "动车",
         "model": "CRH1B",
+        "depot": "幻市局",
         "startStation": "幻市",
         "endStation": "齐河北",
         "startTime": "06:15",
@@ -142,12 +155,14 @@
             { "station": "望京北", "arrive": "12:15", "depart": "12:19", "stay": 4 },
             { "station": "齐河北", "arrive": "12:34", "depart": "--", "stay": 0 }
         ],
-        "seats": { "first": 35, "second": 88 }
+        "seats": { "first": 35, "second": 88 },
+        "funFacts": []
     },
     {
         "trainNo": "D5034",
         "type": "动车",
         "model": "CRH1B",
+        "depot": "幻市局",
         "startStation": "齐河北",
         "endStation": "幻市",
         "startTime": "13:00",
@@ -177,6 +192,61 @@
             { "station": "幻市东", "arrive": "19:02", "depart": "19:04", "stay": 2 },
             { "station": "幻市", "arrive": "19:19", "depart": "--", "stay": 0 }
         ],
-        "seats": { "first": 35, "second": 88 }
+        "seats": { "first": 35, "second": 88 },
+        "funFacts": []
+    },
+    {
+        "trainNo": "DJ5033",
+        "type": "动检",
+        "model": "CR400BF-J",
+        "depot": "望京局",
+        "startStation": "幻市南",
+        "endStation": "望京北",
+        "startTime": "08:00",
+        "endTime": "10:04",
+        "duration": "2小时04分",
+        "stops": [
+            { "station": "幻市南", "arrive": "--", "depart": "08:00", "stay": 0 },
+            { "station": "望京北", "arrive": "10:04", "depart": "--", "stay": 0 }
+        ],
+        "seats": {
+            "司机室": 3,
+            "受电弓": 2,
+            "转向架": 16,
+            "接触网": 60
+        },
+        "funFacts": [
+            "📸 警告：拍摄动检是非常严重的违法行为",
+            "🚫 严禁在铁路沿线及车站站台拍摄动检",
+            "👀 如有发现，铁路集团将把您纳入站务重点关照人士",
+            "💰 并加大对您的抢钱力度"
+        ]
+    },
+    {
+        "trainNo": "DJ5034",
+        "type": "动检",
+        "model": "CR400BF-J",
+        "depot": "望京局",
+        "startStation": "望京北",
+        "endStation": "幻市南",
+        "startTime": "10:30",
+        "endTime": "12:34",
+        "duration": "2小时04分",
+        "stops": [
+            { "station": "望京北", "arrive": "--", "depart": "10:30", "stay": 0 },
+            { "station": "幻市南", "arrive": "12:34", "depart": "--", "stay": 0 }
+        ],
+        "seats": {
+            "司机室": 3,
+            "受电弓": 2,
+            "转向架": 16,
+            "接触网": 60
+        },
+        "funFacts": [
+            "📸 警告：拍摄动检是非常严重的违法行为",
+            "🚫 严禁在铁路沿线及车站站台拍摄动检",
+            "👀 如有发现，铁路集团将把您纳入站务重点关照人士",
+            "💰 并加大对您的抢钱力度"
+        ]
     }
 ]
