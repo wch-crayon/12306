@@ -856,7 +856,10 @@
             area.innerHTML = `<div class="empty-msg">😔 未查询到符合条件的车次，请尝试其他组合</div>`;
             return;
         }
-        let html = `<table class="train-table"><thead><tr><th>车次</th><th>类型</th><th>出发站</th><th>路局</th><th>出发时间</th><th>到达站</th><th>到达时间</th><th>剩余席位</th><th>操作</th></tr></thead><tbody>`;
+        let html = `<table class="train-table"><thead><tr>
+            <th>车次</th><th>类型</th><th>出发站</th><th>路局</th><th>出发时间</th><th>到达站</th><th>到达时间</th><th>剩余席位</th><th>操作</th>
+        </thead><tbody>`;
+        
         for (const t of trainsList) {
             let seatInfo = '';
             if (Object.keys(t.seats).length > 0) {
@@ -869,20 +872,38 @@
             } else {
                 seatInfo = '余票充足';
             }
+            
+            // 出发站标签：始(绿) 或 过(蓝)
+            let startTag = '';
+            if (t.isStart) {
+                startTag = '<span style="background:#10b981; color:white; font-size:0.65rem; padding:2px 8px; border-radius:20px; margin-left:6px;">始</span>';
+            } else {
+                startTag = '<span style="background:#3b82f6; color:white; font-size:0.65rem; padding:2px 8px; border-radius:20px; margin-left:6px;">过</span>';
+            }
+            
+            // 到达站标签：终(红) 或 过(蓝)
+            let endTag = '';
+            if (t.isEnd) {
+                endTag = '<span style="background:#ef4444; color:white; font-size:0.65rem; padding:2px 8px; border-radius:20px; margin-left:6px;">终</span>';
+            } else {
+                endTag = '<span style="background:#3b82f6; color:white; font-size:0.65rem; padding:2px 8px; border-radius:20px; margin-left:6px;">过</span>';
+            }
+            
             html += `<tr>
                 <td><strong>${escapeHtml(t.trainNo)}</strong></td>
                 <td>${getTrainBadgeHtml({ model: t.model, type: t.type, trainNo: t.trainNo })}</td>
-                <td>${escapeHtml(t.startStation)}</td>
+                <td>${escapeHtml(t.startStation)}${startTag}</td>
                 <td style="font-size:0.7rem; color:#6c7a8e;">${t.depot ? escapeHtml(t.depot) : '-'}</td>
                 <td>${escapeHtml(t.departTime)}</td>
-                <td>${escapeHtml(t.endStation)}</td>
+                <td>${escapeHtml(t.endStation)}${endTag}</td>
                 <td>${escapeHtml(t.arriveTime)}</td>
                 <td style="font-size:0.8rem;">${seatInfo}</td>
                 <td><button class="search-btn" style="padding:6px 16px;font-size:0.75rem;" data-train="${t.trainNo}">查看详情</button></td>
             </tr>`;
         }
-        html += `</tbody></table><div style="margin-top:16px; font-size:0.75rem; color:#6c7a8e;">⭐ 点击查看详情可查看完整停站信息</div>`;
+        html += `</tbody><table><div style="margin-top:16px; font-size:0.75rem; color:#6c7a8e;">⭐ 点击查看详情可查看完整停站信息</div>`;
         area.innerHTML = html;
+        
         document.querySelectorAll('[data-train]').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const trainNo = btn.getAttribute('data-train');
