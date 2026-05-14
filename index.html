@@ -50,7 +50,6 @@
             font-size: 0.8rem;
         }
 
-        /* 白色导航栏 */
         .nav-bar {
             background: white;
             border-bottom: 1px solid #e0e8f0;
@@ -214,12 +213,12 @@
             font-weight: 600;
             margin-right: 6px;
         }
-        .badge-g { background: #f97316; color: white; }       /* 高铁 - 橙色 */
-        .badge-d { background: #059669; color: white; }       /* 动车 - 绿色 */
-        .badge-fx { background: #dc2626; color: white; }      /* 复兴号 - 红色 */
-        .badge-smart { background: #3b82f6; color: white; }   /* 智能动车 - 浅蓝 */
-        .badge-dj { background: #eab308; color: #422006; }    /* 动检 - 黄色 */
-        .badge-c { background: #f39c12; color: white; }       /* 其他 - 橙色 */
+        .badge-g { background: #f97316; color: white; }
+        .badge-d { background: #059669; color: white; }
+        .badge-fx { background: #dc2626; color: white; }
+        .badge-smart { background: #3b82f6; color: white; }
+        .badge-dj { background: #eab308; color: #422006; }
+        .badge-c { background: #f39c12; color: white; }
 
         .empty-msg {
             text-align: center;
@@ -269,7 +268,6 @@
             .card { padding: 20px; }
         }
 
-        /* 可搜索下拉框自定义样式 */
         .custom-select-wrapper {
             position: relative;
             width: 100%;
@@ -330,6 +328,15 @@
             background-color: #1a6fa8;
             color: white;
         }
+        .city-header {
+            grid-column: 1/-1;
+            margin-bottom: 8px;
+            padding: 8px 0;
+            border-bottom: 2px solid #ffd700;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1a3a5c;
+        }
     </style>
 </head>
 <body>
@@ -343,7 +350,6 @@
     </div>
 </div>
 
-<!-- 白色导航栏（独立一行） -->
 <div class="nav-bar">
     <div class="nav-bar-content">
         <button class="nav-btn-white active" data-page="home">🏠 首页</button>
@@ -358,12 +364,12 @@
             <div class="card-title">📅 车票预订</div>
             <div class="query-form">
                 <div class="form-group" id="fromStationGroup">
-                    <label>🚉 出发站</label>
+                    <label>🚉 出发站 / 城市</label>
                     <div id="fromStationWrapper" class="custom-select-wrapper"></div>
                     <select id="fromStation" style="display:none;"></select>
                 </div>
                 <div class="form-group" id="toStationGroup">
-                    <label>📍 到达站</label>
+                    <label>📍 到达站 / 城市</label>
                     <div id="toStationWrapper" class="custom-select-wrapper"></div>
                     <select id="toStation" style="display:none;"></select>
                 </div>
@@ -374,23 +380,21 @@
                 <button class="search-btn" id="searchTrainsBtn">🔍 查询车次</button>
             </div>
             <div id="trainResultArea">
-                <div style="text-align:center; padding:40px; color:#8a9bb0;">
-                    ⭐ 请选择始发站和终点站，点击查询
-                </div>
+                <div style="text-align:center; padding:40px; color:#8a9bb0;">⭐ 请选择始发站/城市和到达站/城市，点击查询</div>
             </div>
         </div>
     </div>
 
     <div id="stationPage" class="page">
         <div class="card">
-            <div class="card-title">🚉 车站列表</div>
+            <div class="card-title">🚉 车站查询</div>
             <div style="margin-bottom: 20px;">
-                <input type="text" id="stationSearchInput" placeholder="🔍 输入站名搜索" style="width:100%; padding:12px 15px; border-radius:40px; border:1px solid #cbd5e1;">
+                <input type="text" id="stationSearchInput" placeholder="🔍 输入站名或城市名搜索" style="width:100%; padding:12px 15px; border-radius:40px; border:1px solid #cbd5e1;">
             </div>
             <div class="station-grid" id="stationList"></div>
             <div style="margin-top: 20px; padding: 16px; background: #f8fafd; border-radius: 16px;">
                 <div style="font-weight: 600; margin-bottom: 8px;">📌 查询提示</div>
-                <div style="font-size: 0.85rem; color: #5b6e8c;">点击上方车站标签可快速填入出发站</div>
+                <div style="font-size: 0.85rem; color: #5b6e8c;">点击车站标签可快速填入出发站。输入城市名可查看该城市所有车站</div>
             </div>
         </div>
     </div>
@@ -411,7 +415,7 @@
 </div>
 
 <script>
-    // ==================== 数据存储（初始为空，从JSON加载） ====================
+    // ==================== 数据存储 ====================
     let stationsDatabase = [];
     let trainsDatabase = [];
 
@@ -451,12 +455,10 @@
         
         let badges = [];
         
-        // 动检车特殊处理（先加动检标签）
         if (isDJSeries) {
             badges.push('<span class="badge badge-dj">✂️ 动检</span>');
         }
         
-        // 基础类型
         if (isGSeries) {
             badges.push('<span class="badge badge-g">🚄 高铁</span>');
         } else if (isCSeries) {
@@ -468,7 +470,6 @@
         } else if (trainNo.startsWith("D")) {
             badges.push('<span class="badge badge-d">🚅 动车</span>');
         } else if (isDJSeries && (model.includes("CR400") || model.includes("CR450"))) {
-            // DJ字头 + CR400/CR450 = 高铁（复兴号动检）
             badges.push('<span class="badge badge-g">🚄 高铁</span>');
         } else if (isDJSeries) {
             badges.push('<span class="badge badge-d">🚅 动车</span>');
@@ -476,12 +477,10 @@
             badges.push('<span class="badge badge-d">🚅 动车</span>');
         }
         
-        // 复兴号标签（动检车也加）
         if (isFuxingFlag) {
             badges.push('<span class="badge badge-fx">🎯 复兴号</span>');
         }
         
-        // 智能动车标签
         if (isSmart) {
             badges.push('<span class="badge badge-smart">✨ 智能动车</span>');
         }
@@ -489,7 +488,6 @@
         return badges.join(' ');
     }
 
-    // ==================== 辅助函数 ====================
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/[&<>]/g, function(m) {
@@ -504,7 +502,7 @@
         const fromSelect = document.getElementById('fromStation');
         const toSelect = document.getElementById('toStation');
         if (!fromSelect || !toSelect) return;
-        let options = '<option value="">请选择出发站</option>';
+        let options = '<option value="">请选择出发站/城市</option>';
         stationsDatabase.forEach(s => { options += `<option value="${s.name}">${s.name}</option>`; });
         fromSelect.innerHTML = options;
         toSelect.innerHTML = options;
@@ -528,7 +526,7 @@
                 <span>▼</span>
             </div>
             <div class="custom-select-dropdown" id="${selectId}_dropdown">
-                <input type="text" class="custom-select-search" id="${selectId}_search" placeholder="🔍 搜索车站..." autocomplete="off">
+                <input type="text" class="custom-select-search" id="${selectId}_search" placeholder="🔍 搜索车站或城市..." autocomplete="off">
                 <div class="custom-select-options" id="${selectId}_options"></div>
             </div>
         `;
@@ -542,32 +540,91 @@
         function renderOptions(filterText = '') {
             const kw = filterText.trim().toLowerCase();
             let options = getAllOptions();
-            if (kw) {
-                options = options.filter(opt => opt.text.toLowerCase().includes(kw));
-            }
-            if (options.length === 0) {
-                optionsContainer.innerHTML = '<div style="padding:12px; text-align:center; color:#999;">未找到匹配车站</div>';
-                return;
-            }
-            optionsContainer.innerHTML = options.map(opt => `
-                <div class="custom-select-option ${opt.value === currentValue ? 'selected' : ''}" data-value="${opt.value}" data-text="${opt.text}">
-                    ${escapeHtml(opt.text)}
-                </div>
-            `).join('');
             
-            optionsContainer.querySelectorAll('.custom-select-option').forEach(div => {
-                div.addEventListener('click', () => {
-                    const value = div.getAttribute('data-value');
-                    const text = div.getAttribute('data-text');
-                    select.value = value;
-                    currentValue = value;
-                    currentText = text;
-                    displaySpan.textContent = text;
-                    dropdown.style.display = 'none';
-                    const changeEvent = new Event('change', { bubbles: true });
-                    select.dispatchEvent(changeEvent);
+            if (kw) {
+                const matchedCities = [...new Set(stationsDatabase.filter(s => s.city && s.city.toLowerCase().includes(kw)).map(s => s.city))];
+                const matchedStations = stationsDatabase.filter(s => s.name.toLowerCase().includes(kw));
+                
+                let cityOptions = [];
+                let stationOptions = [];
+                
+                matchedCities.forEach(city => {
+                    const cityStations = stationsDatabase.filter(s => s.city === city);
+                    cityOptions.push({
+                        value: `CITY_${city}`,
+                        text: `🏙️ ${city}（${cityStations.length}个站）`,
+                        isCity: true,
+                        cityName: city
+                    });
                 });
-            });
+                
+                matchedStations.forEach(station => {
+                    if (!cityOptions.some(co => co.cityName === station.city)) {
+                        stationOptions.push({ value: station.name, text: station.name, isCity: false });
+                    }
+                });
+                
+                const allOptions = [...cityOptions, ...stationOptions];
+                
+                if (allOptions.length === 0) {
+                    optionsContainer.innerHTML = '<div style="padding:12px; text-align:center; color:#999;">未找到匹配车站或城市</div>';
+                    return;
+                }
+                
+                optionsContainer.innerHTML = allOptions.map(opt => `
+                    <div class="custom-select-option ${opt.value === currentValue ? 'selected' : ''}" data-value="${opt.value}" data-text="${opt.text}" data-iscity="${opt.isCity || false}" data-cityname="${opt.cityName || ''}">
+                        ${escapeHtml(opt.text)}
+                    </div>
+                `).join('');
+                
+                optionsContainer.querySelectorAll('.custom-select-option').forEach(div => {
+                    div.addEventListener('click', () => {
+                        const value = div.getAttribute('data-value');
+                        const text = div.getAttribute('data-text');
+                        const isCity = div.getAttribute('data-iscity') === 'true';
+                        const cityName = div.getAttribute('data-cityname');
+                        
+                        if (isCity && cityName) {
+                            select.value = cityName;
+                            currentValue = cityName;
+                            currentText = cityName;
+                            displaySpan.textContent = cityName;
+                        } else {
+                            select.value = value;
+                            currentValue = value;
+                            currentText = text;
+                            displaySpan.textContent = text;
+                        }
+                        dropdown.style.display = 'none';
+                        const changeEvent = new Event('change', { bubbles: true });
+                        select.dispatchEvent(changeEvent);
+                    });
+                });
+            } else {
+                if (options.length === 0) {
+                    optionsContainer.innerHTML = '<div style="padding:12px; text-align:center; color:#999;">未找到匹配车站</div>';
+                    return;
+                }
+                optionsContainer.innerHTML = options.map(opt => `
+                    <div class="custom-select-option ${opt.value === currentValue ? 'selected' : ''}" data-value="${opt.value}" data-text="${opt.text}">
+                        ${escapeHtml(opt.text)}
+                    </div>
+                `).join('');
+                
+                optionsContainer.querySelectorAll('.custom-select-option').forEach(div => {
+                    div.addEventListener('click', () => {
+                        const value = div.getAttribute('data-value');
+                        const text = div.getAttribute('data-text');
+                        select.value = value;
+                        currentValue = value;
+                        currentText = text;
+                        displaySpan.textContent = text;
+                        dropdown.style.display = 'none';
+                        const changeEvent = new Event('change', { bubbles: true });
+                        select.dispatchEvent(changeEvent);
+                    });
+                });
+            }
         }
         
         inputDiv.addEventListener('click', (e) => {
@@ -613,16 +670,38 @@
     function renderStationList(keyword = '') {
         const container = document.getElementById('stationList');
         if (!container) return;
+        
         let filtered = stationsDatabase;
+        let isCitySearch = false;
+        let cityName = '';
+        
         if (keyword.trim()) {
             const kw = keyword.trim().toLowerCase();
-            filtered = stationsDatabase.filter(s => s.name.toLowerCase().includes(kw));
+            const matchedCities = [...new Set(stationsDatabase.filter(s => s.city && s.city.toLowerCase().includes(kw)).map(s => s.city))];
+            
+            if (matchedCities.length === 1 && !stationsDatabase.some(s => s.name.toLowerCase() === kw)) {
+                isCitySearch = true;
+                cityName = matchedCities[0];
+                filtered = stationsDatabase.filter(s => s.city === cityName);
+            } else {
+                filtered = stationsDatabase.filter(s => s.name.toLowerCase().includes(kw) || (s.city && s.city.toLowerCase().includes(kw)));
+            }
         }
+        
         container.innerHTML = '';
+        
         if (filtered.length === 0) {
-            container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#8a9bb0;">😔 未找到匹配的车站</div>';
+            container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#8a9bb0;">😔 未找到匹配的车站或城市</div>';
             return;
         }
+        
+        if (isCitySearch) {
+            const cityHeader = document.createElement('div');
+            cityHeader.className = 'city-header';
+            cityHeader.innerHTML = `🏙️ ${cityName}（共${filtered.length}个车站）`;
+            container.appendChild(cityHeader);
+        }
+        
         filtered.forEach(station => {
             const tag = document.createElement('div');
             tag.className = 'station-tag';
@@ -644,40 +723,77 @@
     }
 
     function searchTrainsByStations(start, end) {
-        if (!start || !end) return { success: false, message: '请选择出发站和到达站' };
-        if (start === end) return { success: false, message: '出发站和到达站不能相同' };
+        if (!start || !end) return { success: false, message: '请选择出发站/城市和到达站/城市' };
+        
+        const isCityStart = start === start && stationsDatabase.some(s => s.city === start);
+        const isCityEnd = end === end && stationsDatabase.some(s => s.city === end);
+        
+        let startStations = [];
+        let endStations = [];
+        
+        if (isCityStart) {
+            startStations = stationsDatabase.filter(s => s.city === start).map(s => s.name);
+        } else {
+            startStations = [start];
+        }
+        
+        if (isCityEnd) {
+            endStations = stationsDatabase.filter(s => s.city === end).map(s => s.name);
+        } else {
+            endStations = [end];
+        }
+        
+        if (startStations.length === 0 || endStations.length === 0) {
+            return { success: false, message: '未找到匹配的车站' };
+        }
+        
         const results = [];
         for (const train of trainsDatabase) {
             const stopNames = train.stops.map(s => s.station);
-            const startIdx = stopNames.indexOf(start);
-            const endIdx = stopNames.indexOf(end);
-            if (startIdx !== -1 && endIdx !== -1 && startIdx < endIdx) {
-                const startStop = train.stops[startIdx];
-                const endStop = train.stops[endIdx];
-                results.push({
-                    trainNo: train.trainNo,
-                    type: train.type,
-                    model: train.model,
-                    depot: train.depot,
-                    startStation: start,
-                    endStation: end,
-                    departTime: startStop.depart,
-                    arriveTime: endStop.arrive,
-                    seats: train.seats || {}
-                });
+            for (const startStation of startStations) {
+                for (const endStation of endStations) {
+                    const startIdx = stopNames.indexOf(startStation);
+                    const endIdx = stopNames.indexOf(endStation);
+                    if (startIdx !== -1 && endIdx !== -1 && startIdx < endIdx) {
+                        const startStop = train.stops[startIdx];
+                        const endStop = train.stops[endIdx];
+                        results.push({
+                            trainNo: train.trainNo,
+                            type: train.type,
+                            model: train.model,
+                            depot: train.depot,
+                            startStation: startStation,
+                            endStation: endStation,
+                            departTime: startStop.depart,
+                            arriveTime: endStop.arrive,
+                            seats: train.seats || {}
+                        });
+                    }
+                }
             }
         }
-        return { success: true, data: results };
+        
+        const uniqueResults = [];
+        const seen = new Set();
+        for (const r of results) {
+            const key = `${r.trainNo}|${r.startStation}|${r.endStation}`;
+            if (!seen.has(key)) {
+                seen.add(key);
+                uniqueResults.push(r);
+            }
+        }
+        
+        return { success: true, data: uniqueResults };
     }
 
     function renderTrainList(trainsList) {
         const area = document.getElementById('trainResultArea');
         if (!area) return;
         if (!trainsList || trainsList.length === 0) {
-            area.innerHTML = `<div class="empty-msg">😔 未查询到符合条件的车次，请尝试其他车站组合</div>`;
+            area.innerHTML = `<div class="empty-msg">😔 未查询到符合条件的车次，请尝试其他组合</div>`;
             return;
         }
-        let html = `<table class="train-table"><thead><tr><th>车次</th><th>类型</th><th>出发站</th><th>出发时间</th><th>到达站</th><th>到达时间</th><th>剩余席位</th><th>操作</th></tr></thead><tbody>`;
+        let html = `<table class="train-table"><thead><tr><th>车次</th><th>类型</th><th>出发站</th><th>路局</th><th>出发时间</th><th>到达站</th><th>到达时间</th><th>剩余席位</th><th>操作</th></tr></thead><tbody>`;
         for (const t of trainsList) {
             let seatInfo = '';
             if (Object.keys(t.seats).length > 0) {
@@ -693,7 +809,8 @@
             html += `<tr>
                 <td><strong>${escapeHtml(t.trainNo)}</strong></td>
                 <td>${getTrainBadgeHtml({ model: t.model, type: t.type, trainNo: t.trainNo })}</td>
-                <td>${escapeHtml(t.startStation)}</td>${t.depot ? `<td style="font-size:0.7rem; color:#6c7a8e;">路局：${escapeHtml(t.depot)}</td>` : ''}
+                <td>${escapeHtml(t.startStation)}</td>
+                <td style="font-size:0.7rem; color:#6c7a8e;">${t.depot ? escapeHtml(t.depot) : '-'}</td>
                 <td>${escapeHtml(t.departTime)}</td>
                 <td>${escapeHtml(t.endStation)}</td>
                 <td>${escapeHtml(t.arriveTime)}</td>
@@ -701,7 +818,7 @@
                 <td><button class="search-btn" style="padding:6px 16px;font-size:0.75rem;" data-train="${t.trainNo}">查看详情</button></td>
             </tr>`;
         }
-        html += `</tbody><table><div style="margin-top:16px; font-size:0.75rem; color:#6c7a8e;">⭐ 点击查看详情可查看完整停站信息</div>`;
+        html += `</tbody></table><div style="margin-top:16px; font-size:0.75rem; color:#6c7a8e;">⭐ 点击查看详情可查看完整停站信息</div>`;
         area.innerHTML = html;
         document.querySelectorAll('[data-train]').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -720,7 +837,7 @@
     function renderTrainDetail(train) {
         const container = document.getElementById('trainByNoResult');
         if (!container) return;
-        let stopsHtml = `<table class="train-table" style="margin-top:15px;"><thead><tr><th>车站</th><th>到达时间</th><th>发车时间</th><th>停留时间</th></thead><tbody>`;
+        let stopsHtml = `<table class="train-table" style="margin-top:15px;"><thead><tr><th>车站</th><th>到达时间</th><th>发车时间</th><th>停留时间</th></tr></thead><tbody>`;
         for (const s of train.stops) {
             stopsHtml += `<tr><td>${escapeHtml(s.station)}</td><td>${s.arrive}</td><td>${s.depart}</td><td>${s.stay}分钟</td></tr>`;
         }
@@ -733,14 +850,12 @@
         }
         seatHtml += `</div>`;
         
-        // 担任路局显示
         let depotHtml = train.depot ? `<div style="margin-top:8px; font-size:0.8rem; color:#6c7a8e;">🚩 路局：${escapeHtml(train.depot)}</div>` : '';
         
-        // funFacts（动检彩蛋）
         let funHtml = '';
         if (train.funFacts && train.funFacts.length > 0) {
             funHtml = `<div style="margin-top: 16px; padding: 16px; background: #fff3e0; border-radius: 20px; border-left: 4px solid #ea580c;">
-                <div style="font-weight: 700; margin-bottom: 10px;">🎫 温馨提示</div>
+                <div style="font-weight: 700; margin-bottom: 10px;">🎫 内部票信息（仅供娱乐）</div>
                 <div style="display: flex; flex-wrap: wrap; gap: 12px;">
                     ${train.funFacts.map(f => `<span style="background: #fff0d0; padding: 6px 14px; border-radius: 30px; font-size: 0.8rem;">${escapeHtml(f)}</span>`).join('')}
                 </div>
@@ -776,7 +891,7 @@
         const from = fromSelect ? fromSelect.value : '';
         const to = toSelect ? toSelect.value : '';
         if (!from || !to) {
-            alert('请完整选择出发站和到达站');
+            alert('请完整选择出发站/城市和到达站/城市');
             return;
         }
         const result = searchTrainsByStations(from, to);
@@ -818,10 +933,8 @@
         });
     }
 
-    // ==================== 数据加载与初始化 ====================
     async function loadData() {
         try {
-            // 加载车站数据
             const stationsResponse = await fetch('stations.json');
             if (stationsResponse.ok) {
                 stationsDatabase = await stationsResponse.json();
@@ -830,7 +943,6 @@
                 console.warn('⚠️ stations.json 加载失败');
             }
             
-            // 加载车次数据
             const trainsResponse = await fetch('TrainNumbers.json');
             if (trainsResponse.ok) {
                 trainsDatabase = await trainsResponse.json();
@@ -839,10 +951,9 @@
                 console.warn('⚠️ TrainNumbers.json 加载失败');
             }
             
-            // 数据加载完成后初始化页面
             updateHiddenSelects();
-            createSearchableSelect('fromStation', 'fromStationWrapper', '请选择出发站');
-            createSearchableSelect('toStation', 'toStationWrapper', '请选择到达站');
+            createSearchableSelect('fromStation', 'fromStationWrapper', '请选择出发站/城市');
+            createSearchableSelect('toStation', 'toStationWrapper', '请选择到达站/城市');
             renderStationList('');
             setDefaultDate();
             initNavigation();
@@ -873,7 +984,7 @@
                 });
             }
 
-            document.getElementById('trainResultArea').innerHTML = `<div style="text-align:center; padding:40px; color:#8a9bb0;">✨ 请选择始发站和终点站后点击查询 ✨</div>`;
+            document.getElementById('trainResultArea').innerHTML = `<div style="text-align:center; padding:40px; color:#8a9bb0;">✨ 请选择始发站/城市和到达站/城市后点击查询 ✨</div>`;
             
             window.__MCRAILWAY_DB = {
                 stations: stationsDatabase,
@@ -890,7 +1001,6 @@
         }
     }
 
-    // 启动应用
     loadData();
 </script>
 </body>
