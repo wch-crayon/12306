@@ -693,7 +693,7 @@
             html += `<tr>
                 <td><strong>${escapeHtml(t.trainNo)}</strong></td>
                 <td>${getTrainBadgeHtml({ model: t.model, type: t.type, trainNo: t.trainNo })}</td>
-                <td>${escapeHtml(t.startStation)}</td>${t.depot ? `<td style="font-size:0.7rem; color:#6c7a8e;">担当：${escapeHtml(t.depot)}</td>` : ''}
+                <td>${escapeHtml(t.startStation)}</td>${t.depot ? `<td style="font-size:0.7rem; color:#6c7a8e;">路局：${escapeHtml(t.depot)}</td>` : ''}
                 <td>${escapeHtml(t.departTime)}</td>
                 <td>${escapeHtml(t.endStation)}</td>
                 <td>${escapeHtml(t.arriveTime)}</td>
