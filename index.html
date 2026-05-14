@@ -415,11 +415,9 @@
 </div>
 
 <script>
-    // ==================== 数据存储 ====================
     let stationsDatabase = [];
     let trainsDatabase = [];
 
-    // ==================== 车型智能判断函数 ====================
     function isFuxing(model) {
         if (!model) return false;
         const fuxingModels = ["CR200", "CR220", "CR300", "CR400", "CR450", "复兴号"];
@@ -502,8 +500,20 @@
         const fromSelect = document.getElementById('fromStation');
         const toSelect = document.getElementById('toStation');
         if (!fromSelect || !toSelect) return;
+        
+        const cities = [...new Set(stationsDatabase.filter(s => s.city).map(s => s.city))];
+        
         let options = '<option value="">请选择出发站/城市</option>';
-        stationsDatabase.forEach(s => { options += `<option value="${s.name}">${s.name}</option>`; });
+        
+        cities.forEach(city => {
+            const cityStations = stationsDatabase.filter(s => s.city === city);
+            options += `<option value="CITY_${city}">🏙️ ${city} (城市) - ${cityStations.length}个站</option>`;
+        });
+        
+        stationsDatabase.forEach(s => {
+            options += `<option value="${s.name}">🚉 ${s.name} (车站)</option>`;
+        });
+        
         fromSelect.innerHTML = options;
         toSelect.innerHTML = options;
     }
@@ -539,36 +549,32 @@
         
         function renderOptions(filterText = '') {
             const kw = filterText.trim().toLowerCase();
-            let options = getAllOptions();
             
             if (kw) {
                 const matchedCities = [...new Set(stationsDatabase.filter(s => s.city && s.city.toLowerCase().includes(kw)).map(s => s.city))];
                 const matchedStations = stationsDatabase.filter(s => s.name.toLowerCase().includes(kw));
                 
-                let cityOptions = [];
-                let stationOptions = [];
+                let allOptions = [];
                 
                 matchedCities.forEach(city => {
                     const cityStations = stationsDatabase.filter(s => s.city === city);
-                    cityOptions.push({
+                    allOptions.push({
                         value: `CITY_${city}`,
-                        text: `🏙️ ${city}<span style="font-size:0.7rem; color:#8a9bb0;">(城市)</span>（${cityStations.length}个站）`,
+                        text: `🏙️ ${city} (城市) - ${cityStations.length}个站`,
                         isCity: true,
                         cityName: city
                     });
                 });
                 
                 matchedStations.forEach(station => {
-                    if (!cityOptions.some(co => co.cityName === station.city)) {
-                        stationOptions.push({ 
-                            value: station.name, 
-                            text: `🚉 ${station.name}<span style="font-size:0.7rem; color:#8a9bb0;">(车站)</span>`, 
-                            isCity: false 
+                    if (!matchedCities.includes(station.name)) {
+                        allOptions.push({
+                            value: station.name,
+                            text: `🚉 ${station.name} (车站)`,
+                            isCity: false
                         });
                     }
                 });
-                
-                const allOptions = [...cityOptions, ...stationOptions];
                 
                 if (allOptions.length === 0) {
                     optionsContainer.innerHTML = '<div style="padding:12px; text-align:center; color:#999;">未找到匹配车站或城市</div>';
@@ -589,15 +595,15 @@
                         const cityName = div.getAttribute('data-cityname');
                         
                         if (isCity && cityName) {
-                            select.value = cityName;
-                            currentValue = cityName;
+                            select.value = `CITY_${cityName}`;
+                            currentValue = `CITY_${cityName}`;
                             currentText = cityName;
-                            displaySpan.textContent = cityName;
+                            displaySpan.textContent = `${cityName} (城市)`;
                         } else {
                             select.value = value;
                             currentValue = value;
                             currentText = text;
-                            displaySpan.textContent = text;
+                            displaySpan.textContent = `${text} (车站)`;
                         }
                         dropdown.style.display = 'none';
                         const changeEvent = new Event('change', { bubbles: true });
@@ -605,13 +611,35 @@
                     });
                 });
             } else {
-                if (options.length === 0) {
+                const cities = [...new Set(stationsDatabase.filter(s => s.city).map(s => s.city))];
+                let allOptions = [];
+                
+                cities.forEach(city => {
+                    const cityStations = stationsDatabase.filter(s => s.city === city);
+                    allOptions.push({
+                        value: `CITY_${city}`,
+                        text: `🏙️ ${city} (城市) - ${cityStations.length}个站`,
+                        isCity: true,
+                        cityName: city
+                    });
+                });
+                
+                stationsDatabase.forEach(station => {
+                    allOptions.push({
+                        value: station.name,
+                        text: `🚉 ${station.name} (车站)`,
+                        isCity: false
+                    });
+                });
+                
+                if (allOptions.length === 0) {
                     optionsContainer.innerHTML = '<div style="padding:12px; text-align:center; color:#999;">未找到匹配车站</div>';
                     return;
                 }
-                optionsContainer.innerHTML = options.map(opt => `
-                    <div class="custom-select-option ${opt.value === currentValue ? 'selected' : ''}" data-value="${opt.value}" data-text="${opt.text}">
-                        ${escapeHtml(opt.text)}
+                
+                optionsContainer.innerHTML = allOptions.map(opt => `
+                    <div class="custom-select-option ${opt.value === currentValue ? 'selected' : ''}" data-value="${opt.value}" data-text="${opt.text.replace(/<[^>]*>/g, '')}" data-iscity="${opt.isCity || false}" data-cityname="${opt.cityName || ''}">
+                        ${opt.text}
                     </div>
                 `).join('');
                 
@@ -619,10 +647,20 @@
                     div.addEventListener('click', () => {
                         const value = div.getAttribute('data-value');
                         const text = div.getAttribute('data-text');
-                        select.value = value;
-                        currentValue = value;
-                        currentText = text;
-                        displaySpan.textContent = text;
+                        const isCity = div.getAttribute('data-iscity') === 'true';
+                        const cityName = div.getAttribute('data-cityname');
+                        
+                        if (isCity && cityName) {
+                            select.value = `CITY_${cityName}`;
+                            currentValue = `CITY_${cityName}`;
+                            currentText = cityName;
+                            displaySpan.textContent = `${cityName} (城市)`;
+                        } else {
+                            select.value = value;
+                            currentValue = value;
+                            currentText = text;
+                            displaySpan.textContent = `${text} (车站)`;
+                        }
                         dropdown.style.display = 'none';
                         const changeEvent = new Event('change', { bubbles: true });
                         select.dispatchEvent(changeEvent);
@@ -663,8 +701,14 @@
             const selectedOpt = select.options[select.selectedIndex];
             if (selectedOpt && selectedOpt.value) {
                 currentValue = selectedOpt.value;
-                currentText = selectedOpt.text;
-                displaySpan.textContent = currentText;
+                let displayText = selectedOpt.text;
+                if (selectedOpt.value.startsWith('CITY_')) {
+                    const cityName = selectedOpt.value.replace('CITY_', '');
+                    displayText = `${cityName} (城市)`;
+                } else {
+                    displayText = `${selectedOpt.text} (车站)`;
+                }
+                displaySpan.textContent = displayText;
             } else {
                 displaySpan.textContent = placeholderText;
             }
@@ -730,7 +774,7 @@
                     const changeEvent = new Event('change', { bubbles: true });
                     select.dispatchEvent(changeEvent);
                     const displaySpan = document.getElementById('fromStation_display');
-                    if (displaySpan) displaySpan.textContent = station.name;
+                    if (displaySpan) displaySpan.textContent = `${station.name} (车站)`;
                 }
                 document.querySelector('[data-page="home"]').click();
                 alert(`已将${station.name}填入出发站，可继续选择到达站查询`);
@@ -742,20 +786,22 @@
     function searchTrainsByStations(start, end) {
         if (!start || !end) return { success: false, message: '请选择出发站/城市和到达站/城市' };
         
-        const isCityStart = start === start && stationsDatabase.some(s => s.city === start);
-        const isCityEnd = end === end && stationsDatabase.some(s => s.city === end);
+        const isCityStart = start.startsWith('CITY_');
+        const isCityEnd = end.startsWith('CITY_');
         
         let startStations = [];
         let endStations = [];
         
         if (isCityStart) {
-            startStations = stationsDatabase.filter(s => s.city === start).map(s => s.name);
+            const cityName = start.replace('CITY_', '');
+            startStations = stationsDatabase.filter(s => s.city === cityName).map(s => s.name);
         } else {
             startStations = [start];
         }
         
         if (isCityEnd) {
-            endStations = stationsDatabase.filter(s => s.city === end).map(s => s.name);
+            const cityName = end.replace('CITY_', '');
+            endStations = stationsDatabase.filter(s => s.city === cityName).map(s => s.name);
         } else {
             endStations = [end];
         }
