@@ -829,7 +829,9 @@
                             endStation: endStation,
                             departTime: startStop.depart,
                             arriveTime: endStop.arrive,
-                            seats: train.seats || {}
+                            seats: train.seats || {},
+                            isStart: startIdx === 0,
+                            isEnd: endIdx === train.stops.length - 1
                         });
                     }
                 }
@@ -873,7 +875,7 @@
                 seatInfo = '余票充足';
             }
             
-            // 出发站标签：始(绿) 或 过(蓝)
+            // 出发站标签
             let startTag = '';
             if (t.isStart) {
                 startTag = '<span style="background:#10b981; color:white; font-size:0.65rem; padding:2px 8px; border-radius:20px; margin-left:6px;">始</span>';
@@ -881,7 +883,7 @@
                 startTag = '<span style="background:#3b82f6; color:white; font-size:0.65rem; padding:2px 8px; border-radius:20px; margin-left:6px;">过</span>';
             }
             
-            // 到达站标签：终(红) 或 过(蓝)
+            // 到达站标签
             let endTag = '';
             if (t.isEnd) {
                 endTag = '<span style="background:#ef4444; color:white; font-size:0.65rem; padding:2px 8px; border-radius:20px; margin-left:6px;">终</span>';
@@ -901,7 +903,7 @@
                 <td><button class="search-btn" style="padding:6px 16px;font-size:0.75rem;" data-train="${t.trainNo}">查看详情</button></td>
             </tr>`;
         }
-        html += `</tbody><table><div style="margin-top:16px; font-size:0.75rem; color:#6c7a8e;">⭐ 点击查看详情可查看完整停站信息</div>`;
+        html += `</tbody></table><div style="margin-top:16px; font-size:0.75rem; color:#6c7a8e;">⭐ 点击查看详情可查看完整停站信息</div>`;
         area.innerHTML = html;
         
         document.querySelectorAll('[data-train]').forEach(btn => {

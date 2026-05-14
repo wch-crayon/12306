@@ -20,5 +20,6 @@
     { "code": "10019", "name": "大海西", "city": "大海市", "pinyin": "Dahaixi" },
     { "code": "10020", "name": "江河机场", "city": "望京市", "pinyin": "Jianghe" },
     { "code": "10021", "name": "望京北", "city": "望京市", "pinyin": "Wangjingbei" },
-    { "code": "10022", "name": "齐河北", "city": "齐河市", "pinyin": "Qihebei" }
+    { "code": "10022", "name": "齐河北", "city": "齐河市", "pinyin": "Qihebei" },
+    { "code": "13001", "name": "灰石东", "city": "灰石市", "pinyin": "Huishidong" }
 ]

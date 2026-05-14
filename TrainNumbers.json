@@ -88,6 +88,126 @@
         "funFacts": []
     },
     {
+        "trainNo": "G301",
+        "type": "高铁",
+        "model": "CR400BF-A",
+        "depot": "天海局",
+        "startStation": "幻市南",
+        "endStation": "天海西",
+        "startTime": "06:00",
+        "endTime": "08:40",
+        "duration": "2小时40分",
+        "stops": [
+            { "station": "幻市南", "arrive": "--", "depart": "06:00", "stay": 0 },
+            { "station": "金州西", "arrive": "07:00", "depart": "07:03", "stay": 3 },
+            { "station": "猪市东", "arrive": "07:45", "depart": "07:49", "stay": 4 },
+            { "station": "灰石东", "arrive": "08:24", "depart": "08:27", "stay": 3 },
+            { "station": "天海西", "arrive": "08:40", "depart": "--", "stay": 0 }
+        ],
+        "seats": { "business": 10, "first": 40, "second": 100 },
+        "funFacts": []
+    },
+    {
+        "trainNo": "G302",
+        "type": "高铁",
+        "model": "CR400BF-A",
+        "depot": "天海局",
+        "startStation": "天海西",
+        "endStation": "幻市南",
+        "startTime": "09:00",
+        "endTime": "11:40",
+        "duration": "2小时40分",
+        "stops": [
+            { "station": "天海西", "arrive": "--", "depart": "09:00", "stay": 0 },
+            { "station": "灰石东", "arrive": "09:13", "depart": "09:16", "stay": 3 },
+            { "station": "猪市东", "arrive": "09:51", "depart": "09:55", "stay": 4 },
+            { "station": "金州西", "arrive": "10:37", "depart": "10:40", "stay": 3 },
+            { "station": "幻市南", "arrive": "11:40", "depart": "--", "stay": 0 }
+        ],
+        "seats": { "business": 10, "first": 40, "second": 100 },
+        "funFacts": []
+    },
+    {
+        "trainNo": "G303",
+        "type": "高铁",
+        "model": "CR400BF-A",
+        "depot": "天海局",
+        "startStation": "幻市南",
+        "endStation": "天海西",
+        "startTime": "07:00",
+        "endTime": "09:40",
+        "duration": "2小时40分",
+        "stops": [
+            { "station": "幻市南", "arrive": "--", "depart": "07:00", "stay": 0 },
+            { "station": "金州西", "arrive": "08:00", "depart": "08:03", "stay": 3 },
+            { "station": "猪市东", "arrive": "08:45", "depart": "08:49", "stay": 4 },
+            { "station": "灰石东", "arrive": "09:24", "depart": "09:27", "stay": 3 },
+            { "station": "天海西", "arrive": "09:40", "depart": "--", "stay": 0 }
+        ],
+        "seats": { "business": 10, "first": 40, "second": 100 },
+        "funFacts": []
+    },
+    {
+        "trainNo": "G304",
+        "type": "高铁",
+        "model": "CR400BF-A",
+        "depot": "天海局",
+        "startStation": "天海西",
+        "endStation": "幻市南",
+        "startTime": "10:00",
+        "endTime": "12:40",
+        "duration": "2小时40分",
+        "stops": [
+            { "station": "天海西", "arrive": "--", "depart": "10:00", "stay": 0 },
+            { "station": "灰石东", "arrive": "10:13", "depart": "10:16", "stay": 3 },
+            { "station": "猪市东", "arrive": "10:51", "depart": "10:55", "stay": 4 },
+            { "station": "金州西", "arrive": "11:37", "depart": "11:40", "stay": 3 },
+            { "station": "幻市南", "arrive": "12:40", "depart": "--", "stay": 0 }
+        ],
+        "seats": { "business": 10, "first": 40, "second": 100 },
+        "funFacts": []
+    },
+    {
+        "trainNo": "G305",
+        "type": "高铁",
+        "model": "CR400BF-A",
+        "depot": "天海局",
+        "startStation": "幻市南",
+        "endStation": "天海西",
+        "startTime": "08:00",
+        "endTime": "10:40",
+        "duration": "2小时40分",
+        "stops": [
+            { "station": "幻市南", "arrive": "--", "depart": "08:00", "stay": 0 },
+            { "station": "金州西", "arrive": "09:00", "depart": "09:03", "stay": 3 },
+            { "station": "猪市东", "arrive": "09:45", "depart": "09:49", "stay": 4 },
+            { "station": "灰石东", "arrive": "10:24", "depart": "10:27", "stay": 3 },
+            { "station": "天海西", "arrive": "10:40", "depart": "--", "stay": 0 }
+        ],
+        "seats": { "business": 10, "first": 40, "second": 100 },
+        "funFacts": []
+    },
+    {
+        "trainNo": "G306",
+        "type": "高铁",
+        "model": "CR400BF-A",
+        "depot": "天海局",
+        "startStation": "天海西",
+        "endStation": "幻市南",
+        "startTime": "11:00",
+        "endTime": "13:40",
+        "duration": "2小时40分",
+        "stops": [
+            { "station": "天海西", "arrive": "--", "depart": "11:00", "stay": 0 },
+            { "station": "灰石东", "arrive": "11:13", "depart": "11:16", "stay": 3 },
+            { "station": "猪市东", "arrive": "11:51", "depart": "11:55", "stay": 4 },
+            { "station": "金州西", "arrive": "12:37", "depart": "12:40", "stay": 3 },
+            { "station": "幻市南", "arrive": "13:40", "depart": "--", "stay": 0 }
+        ],
+        "seats": { "business": 10, "first": 40, "second": 100 },
+        "funFacts": []
+    },
+    {
         "trainNo": "C101",
         "type": "高铁",
         "model": "CR400AF-Z",
