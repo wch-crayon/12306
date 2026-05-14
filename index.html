@@ -218,6 +218,7 @@
         .badge-d { background: #059669; color: white; }
         .badge-fx { background: #7c3aed; color: white; }
         .badge-smart { background: #ea580c; color: white; }
+        .badge-dj { background: #8b5cf6; color: white; }
         .badge-c { background: #f39c12; color: white; }
 
         .empty-msg {
@@ -443,11 +444,18 @@
         const trainNo = train.trainNo || "";
         const isGSeries = trainNo.startsWith("G");
         const isCSeries = trainNo.startsWith("C");
+        const isDJSeries = trainNo.startsWith("DJ");
         const isSmart = isSmartTrain(model);
         const isFuxingFlag = isFuxing(model);
         const isNormalHighSpeedFlag = isNormalHighSpeed(model);
         
         let badges = [];
+        
+        // 动检车特殊处理
+        if (isDJSeries) {
+            badges.push('<span class="badge badge-dj">✂️ 动检</span>');
+            return badges.join(' ');
+        }
         
         if (isGSeries) {
             badges.push('<span class="badge badge-g">🚄 高铁</span>');
@@ -643,6 +651,7 @@
                     trainNo: train.trainNo,
                     type: train.type,
                     model: train.model,
+                    depot: train.depot,
                     startStation: start,
                     endStation: end,
                     departTime: startStop.depart,
@@ -667,7 +676,7 @@
             if (Object.keys(t.seats).length > 0) {
                 let items = [];
                 for (let [k, v] of Object.entries(t.seats)) {
-                    let name = { business:'商务座', first:'一等座', second:'二等座', hardSeat:'硬座', hardSleeper:'硬卧', softSleeper:'软卧' }[k] || k;
+                    let name = { business:'商务座', first:'一等座', second:'二等座', hardSeat:'硬座', hardSleeper:'硬卧', softSleeper:'软卧', 司机室:'司机室', 受电弓:'受电弓', 转向架:'转向架', 接触网:'接触网' }[k] || k;
                     items.push(`${name} ${v}张`);
                 }
                 seatInfo = items.join(' / ');
@@ -677,7 +686,7 @@
             html += `<tr>
                 <td><strong>${escapeHtml(t.trainNo)}</strong></td>
                 <td>${getTrainBadgeHtml({ model: t.model, type: t.type, trainNo: t.trainNo })}</td>
-                <td>${escapeHtml(t.startStation)}</td>
+                <td>${escapeHtml(t.startStation)}</td>${t.depot ? `<td style="font-size:0.7rem; color:#6c7a8e;">担当：${escapeHtml(t.depot)}</td>` : ''}
                 <td>${escapeHtml(t.departTime)}</td>
                 <td>${escapeHtml(t.endStation)}</td>
                 <td>${escapeHtml(t.arriveTime)}</td>
@@ -685,7 +694,7 @@
                 <td><button class="search-btn" style="padding:6px 16px;font-size:0.75rem;" data-train="${t.trainNo}">查看详情</button></td>
             </tr>`;
         }
-        html += `</tbody></table><div style="margin-top:16px; font-size:0.75rem; color:#6c7a8e;">⭐ 点击查看详情可查看完整停站信息</div>`;
+        html += `</tbody><table><div style="margin-top:16px; font-size:0.75rem; color:#6c7a8e;">⭐ 点击查看详情可查看完整停站信息</div>`;
         area.innerHTML = html;
         document.querySelectorAll('[data-train]').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -704,7 +713,7 @@
     function renderTrainDetail(train) {
         const container = document.getElementById('trainByNoResult');
         if (!container) return;
-        let stopsHtml = `<table class="train-table" style="margin-top:15px;"><thead><tr><th>车站</th><th>到达时间</th><th>发车时间</th><th>停留时间</th></tr></thead><tbody>`;
+        let stopsHtml = `<table class="train-table" style="margin-top:15px;"><thead><tr><th>车站</th><th>到达时间</th><th>发车时间</th><th>停留时间</th></thead><tbody>`;
         for (const s of train.stops) {
             stopsHtml += `<tr><td>${escapeHtml(s.station)}</td><td>${s.arrive}</td><td>${s.depart}</td><td>${s.stay}分钟</td></tr>`;
         }
@@ -712,18 +721,33 @@
         
         let seatHtml = `<div style="margin-top:16px; background:#f8fafd; padding:12px; border-radius:16px;"><strong>🎫 席位余量</strong><br/>`;
         for (let [k, v] of Object.entries(train.seats)) {
-            let name = { business:'商务座', first:'一等座', second:'二等座', hardSeat:'硬座', hardSleeper:'硬卧', softSleeper:'软卧' }[k] || k;
+            let name = { business:'商务座', first:'一等座', second:'二等座', hardSeat:'硬座', hardSleeper:'硬卧', softSleeper:'软卧', 司机室:'司机室', 受电弓:'受电弓', 转向架:'转向架', 接触网:'接触网' }[k] || k;
             seatHtml += `<span style="margin-right:20px;">${name}: ${v}张</span>`;
         }
         seatHtml += `</div>`;
         
+        // 担当路局显示
+        let depotHtml = train.depot ? `<div style="margin-top:8px; font-size:0.8rem; color:#6c7a8e;">🚩 担当：${escapeHtml(train.depot)}</div>` : '';
+        
+        // funFacts（动检彩蛋）
+        let funHtml = '';
+        if (train.funFacts && train.funFacts.length > 0) {
+            funHtml = `<div style="margin-top: 16px; padding: 16px; background: #fff3e0; border-radius: 20px; border-left: 4px solid #ea580c;">
+                <div style="font-weight: 700; margin-bottom: 10px;">🎫 内部票信息（仅供娱乐）</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+                    ${train.funFacts.map(f => `<span style="background: #fff0d0; padding: 6px 14px; border-radius: 30px; font-size: 0.8rem;">${escapeHtml(f)}</span>`).join('')}
+                </div>
+            </div>`;
+        }
+        
         container.innerHTML = `<div style="background:#f0f7fc; border-radius:24px; padding:20px;">
             <div style="display:flex; justify-content:space-between; flex-wrap:wrap; align-items:center;">
-                <div><span style="font-size:1.8rem; font-weight:700;">${train.trainNo}</span> ${getTrainBadgeHtml(train)}</div>
+                <div><span style="font-size:1.8rem; font-weight:700;">${train.trainNo}</span> ${getTrainBadgeHtml(train)}${depotHtml}</div>
                 <div>${train.startStation} ${train.startTime} → ${train.endStation} ${train.endTime}  全程 ${train.duration}</div>
             </div>
             ${stopsHtml}
             ${seatHtml}
+            ${funHtml}
             <div style="margin-top: 20px; padding: 16px; background: #eef2f8; border-radius: 20px;">
                 <div style="font-weight: 700; margin-bottom: 10px;">🚆 车型信息</div>
                 <div style="margin-bottom: 12px;"><strong>${train.model || '未知'}</strong></div>
@@ -796,7 +820,7 @@
                 stationsDatabase = await stationsResponse.json();
                 console.log(`✅ 已加载 ${stationsDatabase.length} 个车站`);
             } else {
-                console.warn('⚠️ stations.json 加载失败，使用默认数据');
+                console.warn('⚠️ stations.json 加载失败');
             }
             
             // 加载车次数据
