@@ -467,7 +467,12 @@
             }
         } else if (trainNo.startsWith("D")) {
             badges.push('<span class="badge badge-d">🚅 动车</span>');
-        } else if (!isDJSeries) {
+        } else if (isDJSeries && (model.includes("CR400") || model.includes("CR450"))) {
+            // DJ字头 + CR400/CR450 = 高铁（复兴号动检）
+            badges.push('<span class="badge badge-g">🚄 高铁</span>');
+        } else if (isDJSeries) {
+            badges.push('<span class="badge badge-d">🚅 动车</span>');
+        } else {
             badges.push('<span class="badge badge-d">🚅 动车</span>');
         }
         
