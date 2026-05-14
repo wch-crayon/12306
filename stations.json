@@ -13,6 +13,9 @@
     { "code": "10012", "name": "南汇西", "city": "南汇市", "pinyin": "Nanhuixi" },
     { "code": "10013", "name": "猪市南", "city": "猪市", "pinyin": "Zhushinan" },
     { "code": "10014", "name": "猪市东", "city": "猪市", "pinyin": "Zhushidong" },
+    { "code": "12001", "name": "猪市西", "city": "猪市", "pinyin": "Zhushixi" },
+    { "code": "12002", "name": "猪市北", "city": "猪市", "pinyin": "Zhushibei" },
+    { "code": "12003", "name": "猪市", "city": "猪市", "pinyin": "Zhushi" },
     { "code": "10015", "name": "东州机场", "city": "天海市", "pinyin": "Dongzhou" },
     { "code": "10016", "name": "天海中华", "city": "天海市", "pinyin": "Tianhai" },
     { "code": "10017", "name": "天海西", "city": "天海市", "pinyin": "Tianhai" },
@@ -20,6 +23,12 @@
     { "code": "10019", "name": "大海西", "city": "大海市", "pinyin": "Dahaixi" },
     { "code": "10020", "name": "江河机场", "city": "望京市", "pinyin": "Jianghe" },
     { "code": "10021", "name": "望京北", "city": "望京市", "pinyin": "Wangjingbei" },
+    { "code": "14001", "name": "望京南", "city": "望京市", "pinyin": "Wangjingnan" },
+    { "code": "14002", "name": "望京西", "city": "望京市", "pinyin": "Wangjingxi" },
+    { "code": "14003", "name": "望京东", "city": "望京市", "pinyin": "Wangjingdong" },
+    { "code": "14004", "name": "望京湿地", "city": "望京市", "pinyin": "Wangjing Shidi" },
+    { "code": "14005", "name": "望京", "city": "望京市", "pinyin": "Wangjing" },
     { "code": "10022", "name": "齐河北", "city": "齐河市", "pinyin": "Qihebei" },
+    { "code": "15001", "name": "齐河", "city": "齐河市", "pinyin": "Qihe" },
     { "code": "13001", "name": "灰石东", "city": "灰石市", "pinyin": "Huishidong" }
 ]
