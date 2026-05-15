@@ -188,7 +188,7 @@ function createSearchableSelect(selectId, wrapperId, placeholderText) {
                                                 select.value = value;
                                                 currentValue = value;
                                                 currentText = text;
-                                                displaySpan.textContent = `${text} (车站)`;
+                                                displaySpan.textContent = text;
                                         }
                                         dropdown.style.display = 'none';
                                         const changeEvent = new Event('change', { bubbles: true });
