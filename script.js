@@ -601,61 +601,51 @@ function renderTrainDetail(train) {
 }
 
 function renderStationSchedule(stationName) {
-        const container = document.getElementById('trainByNoResult');
-        if (!container) return;
+    const container = document.getElementById('trainByNoResult');
+    if (!container) return;
 
-        const schedule = getStationSchedule(stationName);
+    // 获取车站信息
+    const stationInfo = stationsDatabase.find(s => s.name === stationName);
+    const city = stationInfo ? stationInfo.city : '未知';
+    const depot = stationInfo ? stationInfo.depot : '未知';
 
-        if (!schedule.length) {
-                container.innerHTML = `<div class="empty-msg">😔 ${stationName} 今日无经停车次</div>`;
-                return;
-        }
+    const schedule = getStationSchedule(stationName);
 
-        let html = `<div style="margin-bottom: 20px;">
-                        <div style="font-size: 1.2rem; font-weight: 700; color: #1a3a5c;">🚉 ${stationName} 经停车次</div>
-                        <div style="font-size: 0.8rem; color: #6c7a8e;">共 ${schedule.length} 趟车次</div>
-                    </div>
-                    <table class="train-table"><thead>
-                        <th>车次</th>
-                        <th>类型</th>
-                        <th>到达时间</th>
-                        <th>发车时间</th>
-                        <th>停留</th>
-                        <th>始发站</th>
-                        <th>终到站</th>
-                        <th>路局</th>
-                        <th>操作</th>
-                    </thead><tbody>`;
+    if (!schedule.length) {
+        container.innerHTML = `<div class="empty-msg">😔 ${stationName} 今日无经停车次</div>`;
+        return;
+    }
 
-        for (const t of schedule) {
-                html += `<tr>
-                        <td><strong>${escapeHtml(t.trainNo)}</strong></td>
-                        <td>${getTrainBadgeHtml({ model: t.model, type: t.type, trainNo: t.trainNo })}</td>
-                        <td>${t.arriveTime !== '--' ? t.arriveTime : '-'}</td>
-                        <td>${t.departTime !== '--' ? t.departTime : '-'}</td>
-                        <td>${t.stay}分钟</td>
-                        <td>${escapeHtml(t.origin)}</td>
-                        <td>${escapeHtml(t.terminal)}</td>
-                        <td style="font-size:0.7rem;">${t.depot || '-'}</td>
-                        <td><button class="search-btn" style="padding:6px 16px;font-size:0.75rem;" data-train="${t.trainNo}">查看详情</button></td>
-                </tr>`;
-        }
+    let html = `<div style="margin-bottom: 20px;">
+                    <div style="font-size: 1.4rem; font-weight: 700; color: #1a3a5c;">🚉 ${stationName}</div>
+                    <div style="font-size: 0.8rem; color: #8a9bb0; margin-top: 4px;">${city} &nbsp;|&nbsp; 管辖路局：${depot} &nbsp;|&nbsp; 共 ${schedule.length} 趟车次</div>
+                </div>
+                <table class="train-table"><thead>
+                    <th>车次</th>
+                    <th>类型</th>
+                    <th>到达时间</th>
+                    <th>发车时间</th>
+                    <th>停留</th>
+                    <th>始发站</th>
+                    <th>终到站</th>
+                    <th>路局</th>
+                </thead><tbody>`;
 
-        html += `</tbody></table>`;
-        container.innerHTML = html;
+    for (const t of schedule) {
+        html += `<tr>
+                <td><strong>${escapeHtml(t.trainNo)}</strong></td>
+                <td>${getTrainBadgeHtml({ model: t.model, type: t.type, trainNo: t.trainNo })}</td>
+                <td>${t.arriveTime !== '--' ? t.arriveTime : '-'}</td>
+                <td>${t.departTime !== '--' ? t.departTime : '-'}</td>
+                <td>${t.stay}分钟</td>
+                <td>${escapeHtml(t.origin)}</td>
+                <td>${escapeHtml(t.terminal)}</td>
+                <td style="font-size:0.7rem;">${t.depot || '-'}</td>
+            </tr>`;
+    }
 
-        // 绑定查看详情按钮
-        document.querySelectorAll('#trainByNoResult [data-train]').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                        const trainNo = btn.getAttribute('data-train');
-                        const train = trainsDatabase.find(t => t.trainNo === trainNo);
-                        if (train) {
-                                renderTrainDetail(train);
-                        } else {
-                                alert('未找到车次详情');
-                        }
-                });
-        });
+    html += `</tbody></table>`;
+    container.innerHTML = html;
 }
 
 function searchTrainByNo(trainNo) {
