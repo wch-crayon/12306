@@ -96,7 +96,7 @@ function updateHiddenSelects() {
         });
         
         stationsDatabase.forEach(s => {
-                options += `<option value="${s.name}">🚉 ${s.name} (车站)</option>`;
+                options += `<option value="${s.name}">🚉 ${s.name}</option>`;
         });
         
         fromSelect.innerHTML = options;
