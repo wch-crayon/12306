@@ -244,7 +244,7 @@ function createSearchableSelect(selectId, wrapperId, placeholderText) {
                                                 select.value = value;
                                                 currentValue = value;
                                                 currentText = text;
-                                                displaySpan.textContent = `${text} (车站)`;
+                                                displaySpan.textContent = text;
                                         }
                                         dropdown.style.display = 'none';
                                         const changeEvent = new Event('change', { bubbles: true });
@@ -283,20 +283,24 @@ function createSearchableSelect(selectId, wrapperId, placeholderText) {
         renderOptions('');
         
         select.addEventListener('change', () => {
-                const selectedOpt = select.options[select.selectedIndex];
-                if (selectedOpt && selectedOpt.value) {
-                        currentValue = selectedOpt.value;
-                        let displayText = selectedOpt.text;
-                        if (selectedOpt.value.startsWith('CITY_')) {
-                                const cityName = selectedOpt.value.replace('CITY_', '');
-                                displayText = `${cityName} (城市)`;
-                        } else {
-                                displayText = `${selectedOpt.text} (车站)`;
-                        }
-                        displaySpan.textContent = displayText;
+            const selectedOpt = select.options[select.selectedIndex];
+            if (selectedOpt && selectedOpt.value) {
+                currentValue = selectedOpt.value;
+                let displayText = selectedOpt.text;
+        
+                // 去掉选项里的图标和已有后缀
+                displayText = displayText.replace(/^[🚉🏙️]\s*/, '');
+                displayText = displayText.replace(/\s*\(车站\)\s*/, '');
+                displayText = displayText.replace(/\s*\(城市\)\s*/, '');
+        
+                if (selectedOpt.value.startsWith('CITY_')) {
+                    displaySpan.textContent = `${displayText} (城市)`;
                 } else {
-                        displaySpan.textContent = placeholderText;
+                    displaySpan.textContent = `${displayText} (车站)`;
                 }
+            } else {
+                displaySpan.textContent = placeholderText;
+            }
         });
 }
 
