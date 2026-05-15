@@ -623,7 +623,7 @@ function renderStationSchedule(stationName) {
                         <th>停留</th>
                         <th>始发站</th>
                         <th>终到站</th>
-                        <th>担当路局</th>
+                        <th>路局</th>
                         <th>操作</th>
                     </thead><tbody>`;
 
