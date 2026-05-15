@@ -867,7 +867,18 @@
             if (Object.keys(t.seats).length > 0) {
                 let items = [];
                 for (let [k, v] of Object.entries(t.seats)) {
-                    let name = { business:'商务座', first:'一等座', second:'二等座', hardSeat:'硬座', hardSleeper:'硬卧', softSleeper:'软卧', 司机室:'司机室', 受电弓:'受电弓', 转向架:'转向架', 接触网:'接触网' }[k] || k;
+        	let seatNameMap = {
+                    'business': '商务座',
+                    'first': '一等座',
+                    'premiumFirst': '优选一等座',
+                    'second': '二等座',
+                    'standing': '无座',
+                    'driverRoom': '司机室',
+                    'pantograph': '受电弓',
+                    'bogie': '转向架',
+                    'catenary': '接触网'
+                };
+        let name = seatNameMap[k] || k;
                     items.push(`${name} ${v}张`);
                 }
                 seatInfo = items.join(' / ');
