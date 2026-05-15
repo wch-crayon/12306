@@ -357,16 +357,8 @@ function renderStationList(keyword = '') {
                 }
                 
                 tag.addEventListener('click', () => {
-                        const select = document.getElementById('fromStation');
-                        if (select) {
-                                select.value = station.name;
-                                const changeEvent = new Event('change', { bubbles: true });
-                                select.dispatchEvent(changeEvent);
-                                const displaySpan = document.getElementById('fromStation_display');
-                                if (displaySpan) displaySpan.textContent = `${station.name} (车站)`;
-                        }
-                        document.querySelector('[data-page="home"]').click();
-                        alert(`已将${station.name}填入出发站，可继续选择到达站查询`);
+                    renderStationSchedule(station.name);
+                    document.querySelector('[data-page="train"]').click();
                 });
                 container.appendChild(tag);
         });
@@ -438,6 +430,39 @@ function searchTrainsByStations(start, end) {
         }
         
         return { success: true, data: uniqueResults };
+}
+
+function getStationSchedule(stationName) {
+        const schedule = [];
+
+        if (!stationName || !trainsDatabase.length) {
+                return schedule;
+        }
+
+        for (const train of trainsDatabase) {
+                if (!train.stops) continue;
+                const stop = train.stops.find(s => s.station === stationName);
+                if (!stop) continue;
+                schedule.push({
+                        trainNo: train.trainNo,
+                        type: train.type,
+                        model: train.model,
+                        depot: train.depot,
+                        arriveTime: stop.arrive,
+                        departTime: stop.depart,
+                        stay: stop.stay,
+                        origin: train.startStation,
+                        terminal: train.endStation
+                });
+        }
+
+        schedule.sort((a, b) => {
+                const timeA = a.departTime !== '--' ? a.departTime : a.arriveTime;
+                const timeB = b.departTime !== '--' ? b.departTime : b.arriveTime;
+                return timeA.localeCompare(timeB);
+        });
+
+        return schedule;
 }
 
 function renderTrainList(trainsList) {
@@ -573,6 +598,42 @@ function renderTrainDetail(train) {
                         </div>
                 </div>
         </div>`;
+}
+
+function renderStationSchedule(stationName) {
+        const container = document.getElementById('trainByNoResult');
+        if (!container) return;
+
+        const schedule = getStationSchedule(stationName);
+
+        if (!schedule.length) {
+                container.innerHTML = `<div class="empty-msg">😔 ${stationName} 今日无经停车次</div>`;
+                return;
+        }
+
+        let html = `<div style="margin-bottom: 20px;">
+                        <div style="font-size: 1.2rem; font-weight: 700; color: #1a3a5c;">🚉 ${stationName} 经停车次</div>
+                        <div style="font-size: 0.8rem; color: #6c7a8e;">共 ${schedule.length} 趟车次</div>
+                    </div>
+                    <table class="train-table"><thead>
+                        <th>车次</th><th>类型</th><th>到达时间</th><th>发车时间</th><th>停留</th><th>始发站</th><th>终到站</th><th>担当路局</th>
+                    </thead><tbody>`;
+
+        for (const t of schedule) {
+                html += `<tr>
+                        <td><strong>${escapeHtml(t.trainNo)}</strong></td>
+                        <td>${getTrainBadgeHtml({ model: t.model, type: t.type, trainNo: t.trainNo })}</td>
+                        <td>${t.arriveTime !== '--' ? t.arriveTime : '-'}</td>
+                        <td>${t.departTime !== '--' ? t.departTime : '-'}</td>
+                        <td>${t.stay}分钟</td>
+                        <td>${escapeHtml(t.origin)}</td>
+                        <td>${escapeHtml(t.terminal)}</td>
+                        <td style="font-size:0.7rem;">${t.depot || '-'}</td>
+                </tr>`;
+        }
+
+        html += `</tbody></table>`;
+        container.innerHTML = html;
 }
 
 function searchTrainByNo(trainNo) {

@@ -19,6 +19,7 @@
     { "code": "10015", "name": "东州机场", "city": "天海市", "pinyin": "Dongzhou" },
     { "code": "10016", "name": "天海中华", "city": "天海市", "pinyin": "Tianhai" },
     { "code": "10017", "name": "天海西", "city": "天海市", "pinyin": "Tianhai" },
+    { "code": "10302", "name": "天海东", "city": "天海市", "pinyin": "Tianhai" },
     { "code": "10018", "name": "临海北", "city": "临海市", "pinyin": "Linhaibei" },
     { "code": "10019", "name": "大海西", "city": "大海市", "pinyin": "Dahaixi" },
     { "code": "10020", "name": "江河机场", "city": "望京市", "pinyin": "Jianghe" },

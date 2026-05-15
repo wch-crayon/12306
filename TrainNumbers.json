@@ -257,40 +257,6 @@
             { "station": "猪市东", "arrive": "--", "depart": "08:00", "stay": 0 },
             { "station": "齐河北", "arrive": "09:08", "depart": "--", "stay": 0 }
         ],
-        "seats": { "business": 12, "first": 45, "second": 120, "premiumFirst": 20, "standing": 150 },
-        "funFacts": []
-    },
-    {
-        "trainNo": "C102",
-        "type": "高铁",
-        "model": "CR400AF-Z",
-        "depot": "猪市局",
-        "startStation": "齐河北",
-        "endStation": "猪市东",
-        "startTime": "09:40",
-        "endTime": "10:48",
-        "duration": "1小时08分",
-        "stops": [
-            { "station": "齐河北", "arrive": "--", "depart": "09:40", "stay": 0 },
-            { "station": "猪市东", "arrive": "10:48", "depart": "--", "stay": 0 }
-        ],
-        "seats": { "business": 12, "first": 45, "second": 120, "premiumFirst": 20, "standing": 150 },
-        "funFacts": []
-    },
-    {
-        "trainNo": "C101",
-        "type": "高铁",
-        "model": "CR400AF-Z",
-        "depot": "猪市局",
-        "startStation": "猪市东",
-        "endStation": "齐河北",
-        "startTime": "08:00",
-        "endTime": "09:08",
-        "duration": "1小时08分",
-        "stops": [
-            { "station": "猪市东", "arrive": "--", "depart": "08:00", "stay": 0 },
-            { "station": "齐河北", "arrive": "09:08", "depart": "--", "stay": 0 }
-        ],
         "seats": { "business": 12, "first": 45, "second": 120, "standing": 150 },
         "funFacts": []
     },
@@ -591,6 +557,66 @@
         "stops": [
             { "station": "齐河北", "arrive": "--", "depart": "12:00", "stay": 0 },
             { "station": "幻市南", "arrive": "14:47", "depart": "--", "stay": 0 }
+        ],
+        "seats": {
+            "driverRoom": 3,
+            "pantograph": 2,
+            "bogie": 16,
+            "catenary": 60
+        },
+        "funFacts": [
+            "📸 警告：拍摄动检是非常严重的违法行为",
+            "🚫 严禁在铁路沿线及车站站台拍摄动检",
+            "👀 如有发现，铁路集团将把您纳入站务重点关照人士",
+            "💰 并加大对您的抢钱力度"
+        ]
+    },
+    {
+        "trainNo": "DJ2252",
+        "type": "动检",
+        "model": "CRH2J",
+        "depot": "天海局",
+        "startStation": "天海东",
+        "endStation": "幻市南",
+        "startTime": "06:00",
+        "endTime": "10:51",
+        "duration": "4小时51分",
+        "stops": [
+            { "station": "天海东", "arrive": "--", "depart": "06:00", "stay": 0 },
+            { "station": "灰石东", "arrive": "06:04", "depart": "06:06", "stay": 2 },
+            { "station": "猪市东", "arrive": "07:16", "depart": "07:19", "stay": 3 },
+            { "station": "南汇西", "arrive": "08:17", "depart": "08:21", "stay": 4 },
+            { "station": "幻市南", "arrive": "10:51", "depart": "--", "stay": 0 }
+         ],
+        "seats": {
+            "driverRoom": 3,
+            "pantograph": 2,
+            "bogie": 16,
+            "catenary": 60
+        },
+        "funFacts": [
+            "📸 警告：拍摄动检是非常严重的违法行为",
+            "🚫 严禁在铁路沿线及车站站台拍摄动检",
+            "👀 如有发现，铁路集团将把您纳入站务重点关照人士",
+            "💰 并加大对您的抢钱力度"
+        ]
+    },
+    {
+        "trainNo": "DJ2251",
+        "type": "动检",
+        "model": "CRH2J",
+        "depot": "天海局",
+        "startStation": "幻市南",
+        "endStation": "天海东",
+        "startTime": "11:00",
+        "endTime": "15:51",
+        "duration": "4小时51分",
+        "stops": [
+            { "station": "幻市南", "arrive": "--", "depart": "11:00", "stay": 0 },
+            { "station": "南汇西", "arrive": "13:30", "depart": "13:34", "stay": 4 },
+            { "station": "猪市东", "arrive": "14:32", "depart": "14:35", "stay": 3 },
+            { "station": "灰石东", "arrive": "15:45", "depart": "15:47", "stay": 2 },
+            { "station": "天海东", "arrive": "15:51", "depart": "--", "stay": 0 }
         ],
         "seats": {
             "driverRoom": 3,
