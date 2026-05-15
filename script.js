@@ -611,25 +611,28 @@ function renderStationSchedule(stationName) {
 
     const schedule = getStationSchedule(stationName);
 
-    if (!schedule.length) {
-        container.innerHTML = `<div class="empty-msg">😔 ${stationName} 今日无经停车次</div>`;
-        return;
-    }
-
+    // 先显示车站信息（无论有无车次）
     let html = `<div style="margin-bottom: 20px;">
                     <div style="font-size: 1.4rem; font-weight: 700; color: #1a3a5c;">🚉 ${stationName}</div>
                     <div style="font-size: 0.8rem; color: #8a9bb0; margin-top: 4px;">${city} &nbsp;|&nbsp; 管辖路局：${depot} &nbsp;|&nbsp; 共 ${schedule.length} 趟车次</div>
-                </div>
-                <table class="train-table"><thead>
-                    <th>车次</th>
-                    <th>类型</th>
-                    <th>到达时间</th>
-                    <th>发车时间</th>
-                    <th>停留</th>
-                    <th>始发站</th>
-                    <th>终到站</th>
-                    <th>路局</th>
-                </thead><tbody>`;
+                </div>`;
+
+    if (!schedule.length) {
+        html += `<div class="empty-msg">😔 暂无经停车次</div>`;
+        container.innerHTML = html;
+        return;
+    }
+
+    html += `<table class="train-table"><thead>
+                <th>车次</th>
+                <th>类型</th>
+                <th>到达时间</th>
+                <th>发车时间</th>
+                <th>停留</th>
+                <th>始发站</th>
+                <th>终到站</th>
+                <th>路局</th>
+            </thead><tbody>`;
 
     for (const t of schedule) {
         html += `<tr>
