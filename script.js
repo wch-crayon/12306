@@ -616,7 +616,15 @@ function renderStationSchedule(stationName) {
                         <div style="font-size: 0.8rem; color: #6c7a8e;">共 ${schedule.length} 趟车次</div>
                     </div>
                     <table class="train-table"><thead>
-                        <th>车次</th><th>类型</th><th>到达时间</th><th>发车时间</th><th>停留</th><th>始发站</th><th>终到站</th><th>担当路局</th>
+                        <th>车次</th>
+                        <th>类型</th>
+                        <th>到达时间</th>
+                        <th>发车时间</th>
+                        <th>停留</th>
+                        <th>始发站</th>
+                        <th>终到站</th>
+                        <th>担当路局</th>
+                        <th>操作</th>
                     </thead><tbody>`;
 
         for (const t of schedule) {
@@ -629,11 +637,25 @@ function renderStationSchedule(stationName) {
                         <td>${escapeHtml(t.origin)}</td>
                         <td>${escapeHtml(t.terminal)}</td>
                         <td style="font-size:0.7rem;">${t.depot || '-'}</td>
+                        <td><button class="search-btn" style="padding:6px 16px;font-size:0.75rem;" data-train="${t.trainNo}">查看详情</button></td>
                 </tr>`;
         }
 
         html += `</tbody></table>`;
         container.innerHTML = html;
+
+        // 绑定查看详情按钮
+        document.querySelectorAll('#trainByNoResult [data-train]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                        const trainNo = btn.getAttribute('data-train');
+                        const train = trainsDatabase.find(t => t.trainNo === trainNo);
+                        if (train) {
+                                renderTrainDetail(train);
+                        } else {
+                                alert('未找到车次详情');
+                        }
+                });
+        });
 }
 
 function searchTrainByNo(trainNo) {
