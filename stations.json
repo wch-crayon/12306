@@ -44,7 +44,7 @@
     { "code": "13012", "name": "江海", "city": "江海市", "pinyin": "Jianghai", "depot": "天海局" },
     { "code": "13013", "name": "仙海北", "city": "仙海市", "pinyin": "Xianhaibei", "depot": "天海局" },
     { "code": "13014", "name": "天河西", "city": "天河市", "pinyin": "Tianhexi", "depot": "天海局" },
-    { "code": "13015", "name": "白海港北", "city": "白海市", "pinyin": "Baihaigangbei", "depot": "天海局" },
+    { "code": "13015", "name": "白海港北", "city": "白海港市", "pinyin": "Baihaigangbei", "depot": "天海局" },
     { "code": "13016", "name": "新东", "city": "新东市", "pinyin": "Xindong", "depot": "天海局" },
     { "code": "13017", "name": "南山西", "city": "南山市", "pinyin": "Nanshanxi", "depot": "天海局" },
     { "code": "13018", "name": "关东西", "city": "关东市", "pinyin": "Guandongxi", "depot": "天海局" },
