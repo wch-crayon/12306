@@ -632,6 +632,7 @@ function renderStationSchedule(stationName) {
                 <th>始发站</th>
                 <th>终到站</th>
                 <th>路局</th>
+                <th>操作</th>
             </thead><tbody>`;
 
     for (const t of schedule) {
@@ -644,11 +645,26 @@ function renderStationSchedule(stationName) {
                 <td>${escapeHtml(t.origin)}</td>
                 <td>${escapeHtml(t.terminal)}</td>
                 <td style="font-size:0.7rem;">${t.depot || '-'}</td>
+                <td><button class="search-btn" style="padding:4px 12px;font-size:0.7rem;" data-train="${t.trainNo}">查看详情</button></td>
             </tr>`;
     }
 
     html += `</tbody></table>`;
     container.innerHTML = html;
+
+    // 绑定查看详情按钮事件
+    document.querySelectorAll('#trainByNoResult [data-train]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const trainNo = btn.getAttribute('data-train');
+            const train = trainsDatabase.find(t => t.trainNo === trainNo);
+            if (train) {
+                renderTrainDetail(train);
+                document.querySelector('[data-page="train"]').click();
+            } else {
+                alert('未找到车次详情');
+            }
+        });
+    });
 }
 
 function searchTrainByNo(trainNo) {
