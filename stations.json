@@ -54,7 +54,6 @@
     { "code": "13024", "name": "台海西", "city": "台海市", "pinyin": "Taihaixi", "depot": "天海局" },
     { "code": "13025", "name": "帝都北", "city": "帝都市", "pinyin": "Didubei", "depot": "天海局" },
     { "code": "13026", "name": "城广西", "city": "城广市", "pinyin": "Chengguangxi", "depot": "天海局" },
-    { "code": "13027", "name": "安宁北", "city": "安宁市", "pinyin": "Anningbei", "depot": "天海局" }
     { "code": "13027", "name": "安宁北", "city": "安宁市", "pinyin": "Anningbei", "depot": "天海局" },
     { "code": "10301", "name": "淋湾", "city": "淋湾市", "pinyin": "Linwan", "depot": "淋湾局" },
     { "code": "18001", "name": "淋湾西", "city": "淋湾市", "pinyin": "Linwanxi", "depot": "淋湾局" },
