@@ -348,6 +348,40 @@
         ]
     },
     {
+        "trainNo": "D307",
+        "type": "动车",
+        "model": "CRH2A",
+        "depot": "淋湾局",
+        "startStation": "幻市南",
+        "endStation": "淋湾",
+        "startTime": "17:20",
+        "endTime": "18:50",
+        "duration": "1小时30分",
+        "stops": [
+            { "station": "幻市南", "arrive": "--", "depart": "17:20", "stay": 0 },
+            { "station": "淋湾", "arrive": "18:50", "depart": "--", "stay": 0 }
+        ],
+        "seats": { "first": 40, "second": 100, "standing": 80 },
+        "funFacts": []
+    },
+    {
+        "trainNo": "D308",
+        "type": "动车",
+        "model": "CRH2A",
+        "depot": "淋湾局",
+        "startStation": "淋湾",
+        "endStation": "幻市南",
+        "startTime": "19:10",
+        "endTime": "20:40",
+        "duration": "1小时30分",
+        "stops": [
+            { "station": "淋湾", "arrive": "--", "depart": "19:10", "stay": 0 },
+            { "station": "幻市南", "arrive": "20:40", "depart": "--", "stay": 0 }
+        ],
+        "seats": { "first": 40, "second": 100, "standing": 80 },
+        "funFacts": []
+    },
+    {
         "trainNo": "D5033",
         "type": "动车",
         "model": "CRH1B",
