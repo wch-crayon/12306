@@ -88,6 +88,44 @@
         "funFacts": []
     },
     {
+        "trainNo": "G205",
+        "type": "高铁",
+        "model": "CRH380A重联型",
+        "depot": "淋湾局",
+        "startStation": "幻市",
+        "endStation": "淋湾",
+        "startTime": "07:30",
+        "endTime": "09:23",
+        "duration": "1小时53分",
+        "stops": [
+            { "station": "幻市", "arrive": "--", "depart": "07:30", "stay": 0 },
+            { "station": "幻市南", "arrive": "07:50", "depart": "07:53", "stay": 3 },
+            { "station": "淋湾西", "arrive": "09:03", "depart": "09:08", "stay": 5 },
+            { "station": "淋湾", "arrive": "09:23", "depart": "--", "stay": 0 }
+        ],
+        "seats": { "business": 20, "first": 80, "second": 200, "standing": 160 },
+        "funFacts": []
+    },
+    {
+        "trainNo": "G206",
+        "type": "高铁",
+        "model": "CRH380A重联型",
+        "depot": "淋湾局",
+        "startStation": "淋湾",
+        "endStation": "幻市",
+        "startTime": "09:40",
+        "endTime": "11:33",
+        "duration": "1小时53分",
+        "stops": [
+            { "station": "淋湾", "arrive": "--", "depart": "09:40", "stay": 0 },
+            { "station": "淋湾西", "arrive": "09:55", "depart": "10:00", "stay": 5 },
+            { "station": "幻市南", "arrive": "11:10", "depart": "11:13", "stay": 3 },
+            { "station": "幻市", "arrive": "11:33", "depart": "--", "stay": 0 }
+        ],
+        "seats": { "business": 20, "first": 80, "second": 200, "standing": 160 },
+        "funFacts": []
+    },
+    {
         "trainNo": "G301",
         "type": "高铁",
         "model": "CR400BF-A",
