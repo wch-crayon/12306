@@ -1,3 +1,68 @@
+async function loadStations() {
+    const res = await fetch('stations.json');
+    const data = await res.json();
+    stationsDatabase = data.map(s => ({
+        code: s[0],
+        name: s[1],
+        city: s[2],
+        pinyin: s[3],
+        depot: s[4]
+    }));
+    console.log(`✅ 已加载 ${stationsDatabase.length} 个车站`);
+}
+
+async function loadTrains() {
+    const res = await fetch('TrainNumbers.json');
+    const data = await res.json();
+    trainsDatabase = data.map(t => ({
+        trainNo: t.trainNo,
+        model: t.model,
+        depot: t.depot,
+        startStation: t.startStation,
+        endStation: t.endStation,
+        startTime: t.startTime,
+        endTime: t.endTime,
+        stops: t.stops.map(s => ({
+            station: s[0],
+            arrive: s[1],
+            depart: s[2],
+            stay: s[3]
+        })),
+        seats: t.seats,
+        funFacts: t.funFacts || []
+    }));
+    console.log(`✅ 已加载 ${trainsDatabase.length} 个车次`);
+}
+
+function calcDuration(start, end) {
+    const toMin = (t) => {
+        let [h, m] = t.split(':').map(Number);
+        if (h < 6 && t.includes('+1')) h += 24;
+        return h * 60 + m;
+    };
+    let diff = toMin(end) - toMin(start);
+    if (diff < 0) diff += 1440;
+    const h = Math.floor(diff / 60);
+    const m = diff % 60;
+    if (!h) return `${m}分`;
+    if (!m) return `${h}小时`;
+    return `${h}小时${m}分`;
+}
+
+function getTrainType(no, model) {
+    if (model?.includes('动检')) return '动检';
+    if (no.startsWith('G')) return '高铁';
+    if (no.startsWith('D') || no.startsWith('S')) return '动车';
+    if (no.startsWith('C')) {
+        const fast = ["CRH2C", "CRH3C", "CRH380", "CR400", "CR450"];
+        return fast.some(k => model.includes(k)) ? '高铁' : '动车';
+    }
+    if (no.startsWith('DJ')) {
+        const fast = ["CRH380", "CR400", "CR450"];
+        return fast.some(k => model.includes(k)) ? '高铁' : '动车';
+    }
+    return '动车';
+}
 // ==================== 数据存储 ====================
 let stationsDatabase = [];
 let trainsDatabase = [];
@@ -27,48 +92,27 @@ function isNormalHighSpeed(model) {
 }
 
 function getTrainBadgeHtml(train) {
-        const model = train.model || "";
-        const trainNo = train.trainNo || "";
-        const isGSeries = trainNo.startsWith("G");
-        const isCSeries = trainNo.startsWith("C");
-        const isDJSeries = trainNo.startsWith("DJ");
-        const isSmart = isSmartTrain(model);
-        const isFuxingFlag = isFuxing(model);
-        const isNormalHighSpeedFlag = isNormalHighSpeed(model);
-        
-        let badges = [];
-        
-        if (isDJSeries) {
-                badges.push('<span class="badge badge-dj">✂️ 动检</span>');
-        }
-        
-        if (isGSeries) {
-                badges.push('<span class="badge badge-g">🚄 高铁</span>');
-        } else if (isCSeries) {
-                if (isNormalHighSpeedFlag || model.includes("CR400") || model.includes("CR450")) {
-                        badges.push('<span class="badge badge-g">🚄 高铁</span>');
-                } else {
-                        badges.push('<span class="badge badge-d">🚅 动车</span>');
-                }
-        } else if (trainNo.startsWith("D")) {
-                badges.push('<span class="badge badge-d">🚅 动车</span>');
-        } else if (isDJSeries && (model.includes("CR400") || model.includes("CR450"))) {
-                badges.push('<span class="badge badge-g">🚄 高铁</span>');
-        } else if (isDJSeries) {
-                badges.push('<span class="badge badge-d">🚅 动车</span>');
-        } else {
-                badges.push('<span class="badge badge-d">🚅 动车</span>');
-        }
-        
-        if (isFuxingFlag) {
-                badges.push('<span class="badge badge-fx">🎯 复兴号</span>');
-        }
-        
-        if (isSmart) {
-                badges.push('<span class="badge badge-smart">✨ 智能动车</span>');
-        }
-        
-        return badges.join(' ');
+    const model = train.model || "";
+    const trainNo = train.trainNo || "";
+    const trainType = getTrainType(trainNo, model);
+    const isSmart = isSmartTrain(model);
+    const isFuxingFlag = isFuxing(model);
+    let badges = [];
+    if (trainType === '动检') {
+        badges.push('<span class="badge badge-dj">✂️ 动检</span>');
+    }
+    if (trainType === '高铁') {
+        badges.push('<span class="badge badge-g">🚄 高铁</span>');
+    } else if (trainType !== '动检') {
+        badges.push('<span class="badge badge-d">🚅 动车</span>');
+    }
+    if (isFuxingFlag) {
+        badges.push('<span class="badge badge-fx">🎯 复兴号</span>');
+    }
+    if (isSmart) {
+        badges.push('<span class="badge badge-smart">✨ 智能动车</span>');
+    }
+    return badges.join(' ');
 }
 
 function escapeHtml(str) {
@@ -466,138 +510,120 @@ function getStationSchedule(stationName) {
 }
 
 function renderTrainList(trainsList) {
-        const area = document.getElementById('trainResultArea');
-        if (!area) return;
-        if (!trainsList || trainsList.length === 0) {
-                area.innerHTML = `<div class="empty-msg">😔 未查询到符合条件的车次，请尝试其他组合</div>`;
-                return;
-        }
-        let html = `<table class="train-table"><thead>
-                <th>车次</th><th>类型</th><th>出发站</th><th>路局</th><th>出发时间</th><th>到达站</th><th>到达时间</th><th>剩余席位</th><th>操作</th>
+    const area = document.getElementById('trainResultArea');
+    if (!area) return;
+    if (!trainsList || trainsList.length === 0) {
+        area.innerHTML = `<div class="empty-msg">😔 未查询到符合条件的车次，请尝试其他组合</div>`;
+        return;
+    }
+    let html = `<table class="train-table"><thead>
+            <th>车次</th><th>类型</th><th>出发站</th><th>路局</th><th>出发时间</th><th>到达站</th><th>到达时间</th><th>剩余席位</th><th>操作</th>
         </thead><tbody>`;
-        
-        for (const t of trainsList) {
-                let seatInfo = '';
-                if (Object.keys(t.seats).length > 0) {
-                        let items = [];
-                        for (let [k, v] of Object.entries(t.seats)) {
-                                let seatNameMap = {
-                                        'business': '商务座',
-                                        'first': '一等座',
-                                        'premiumFirst': '优选一等座',
-                                        'second': '二等座',
-                                        'standing': '无座',
-                                        'driverRoom': '司机室',
-                                        'pantograph': '受电弓',
-                                        'bogie': '转向架',
-                                        'catenary': '接触网'
-                                };
-                                let name = seatNameMap[k] || k;
-                                items.push(`${name} ${v}张`);
-                        }
-                        seatInfo = items.join(' / ');
-                } else {
-                        seatInfo = '余票充足';
-                }
-                
-                let startTag = '';
-                if (t.isStart) {
-                        startTag = '<span style="background:#10b981; color:white; font-size:0.65rem; padding:2px 8px; border-radius:20px; margin-left:6px;">始</span>';
-                } else {
-                        startTag = '<span style="background:#3b82f6; color:white; font-size:0.65rem; padding:2px 8px; border-radius:20px; margin-left:6px;">过</span>';
-                }
-                
-                let endTag = '';
-                if (t.isEnd) {
-                        endTag = '<span style="background:#ef4444; color:white; font-size:0.65rem; padding:2px 8px; border-radius:20px; margin-left:6px;">终</span>';
-                } else {
-                        endTag = '<span style="background:#3b82f6; color:white; font-size:0.65rem; padding:2px 8px; border-radius:20px; margin-left:6px;">过</span>';
-                }
-                
-                html += `<tr>
-                        <td><strong>${escapeHtml(t.trainNo)}</strong></td>
-                        <td>${getTrainBadgeHtml({ model: t.model, type: t.type, trainNo: t.trainNo })}</td>
-                        <td>${escapeHtml(t.startStation)}${startTag}</td>
-                        <td style="font-size:0.7rem; color:#6c7a8e;">${t.depot ? escapeHtml(t.depot) : '-'}</td>
-                        <td>${escapeHtml(t.departTime)}</td>
-                        <td>${escapeHtml(t.endStation)}${endTag}</td>
-                        <td>${escapeHtml(t.arriveTime)}</td>
-                        <td style="font-size:0.8rem;">${seatInfo}</td>
-                        <td><button class="search-btn" style="padding:6px 16px;font-size:0.75rem;" data-train="${t.trainNo}">查看详情</button></td>
-                <tr>`;
+    for (const t of trainsList) {
+        let seatInfo = '';
+        if (Object.keys(t.seats).length > 0) {
+            let items = [];
+            for (let [k, v] of Object.entries(t.seats)) {
+                let seatNameMap = {
+                    'business': '商务座', 'first': '一等座', 'premiumFirst': '优选一等座', 'second': '二等座',
+                    'standing': '无座', 'driverRoom': '司机室', 'pantograph': '受电弓', 'bogie': '转向架', 'catenary': '接触网'
+                };
+                let name = seatNameMap[k] || k;
+                items.push(`${name} ${v}张`);
+            }
+            seatInfo = items.join(' / ');
+        } else {
+            seatInfo = '余票充足';
         }
-        html += `</tbody></table><div style="margin-top:16px; font-size:0.75rem; color:#6c7a8e;">⭐ 点击查看详情可查看完整停站信息</div>`;
-        area.innerHTML = html;
-        
-        document.querySelectorAll('[data-train]').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                        const trainNo = btn.getAttribute('data-train');
-                        const train = trainsDatabase.find(t => t.trainNo === trainNo);
-                        if (train) {
-                                renderTrainDetail(train);
-                                document.querySelector('[data-page="train"]').click();
-                        } else {
-                                alert('未找到车次详情');
-                        }
-                });
+        let startTag = '';
+        if (t.isStart) {
+            startTag = '<span style="background:#10b981; color:white; font-size:0.65rem; padding:2px 8px; border-radius:20px; margin-left:6px;">始</span>';
+        } else {
+            startTag = '<span style="background:#3b82f6; color:white; font-size:0.65rem; padding:2px 8px; border-radius:20px; margin-left:6px;">过</span>';
+        }
+        let endTag = '';
+        if (t.isEnd) {
+            endTag = '<span style="background:#ef4444; color:white; font-size:0.65rem; padding:2px 8px; border-radius:20px; margin-left:6px;">终</span>';
+        } else {
+            endTag = '<span style="background:#3b82f6; color:white; font-size:0.65rem; padding:2px 8px; border-radius:20px; margin-left:6px;">过</span>';
+        }
+        html += `<tr>
+                <td><strong>${escapeHtml(t.trainNo)}</strong></td>
+                <td>${getTrainBadgeHtml({ model: t.model, trainNo: t.trainNo })}</td>
+                <td>${escapeHtml(t.startStation)}${startTag}</td>
+                <td style="font-size:0.7rem; color:#6c7a8e;">${t.depot ? escapeHtml(t.depot) : '-'}</td>
+                <td>${escapeHtml(t.departTime)}</td>
+                <td>${escapeHtml(t.endStation)}${endTag}</td>
+                <td>${escapeHtml(t.arriveTime)}</td>
+                <td style="font-size:0.8rem;">${seatInfo}</td>
+                <td><button class="search-btn" style="padding:6px 16px;font-size:0.75rem;" data-train="${t.trainNo}">查看详情</button></td>
+            </tr>`;
+    }
+    html += `</tbody></table><div style="margin-top:16px; font-size:0.75rem; color:#6c7a8e;">⭐ 点击查看详情可查看完整停站信息</div>`;
+    area.innerHTML = html;
+    document.querySelectorAll('[data-train]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const trainNo = btn.getAttribute('data-train');
+            const train = trainsDatabase.find(t => t.trainNo === trainNo);
+            if (train) {
+                renderTrainDetail(train);
+                document.querySelector('[data-page="train"]').click();
+            } else {
+                alert('未找到车次详情');
+            }
         });
+    });
 }
 
 function renderTrainDetail(train) {
-        const container = document.getElementById('trainByNoResult');
-        if (!container) return;
-        let stopsHtml = `<table class="train-table" style="margin-top:15px;"><thead><th>车站</th><th>到达时间</th><th>发车时间</th><th>停留时间</th></thead><tbody>`;
-        for (const s of train.stops) {
-                stopsHtml += `<tr><td>${escapeHtml(s.station)}</td><td>${s.arrive}</td><td>${s.depart}</td><td>${s.stay}分钟</td></tr>`;
-        }
-        stopsHtml += `</tbody></table>`;
-        
-        let seatHtml = `<div style="margin-top:16px; background:#f8fafd; padding:12px; border-radius:16px;"><strong>🎫 席位余量</strong><br/>`;
-        for (let [k, v] of Object.entries(train.seats)) {
-                let seatNameMap = {
-                        'business': '商务座',
-                        'first': '一等座',
-                        'premiumFirst': '优选一等座',
-                        'second': '二等座',
-                        'standing': '无座',
-                        'driverRoom': '司机室',
-                        'pantograph': '受电弓',
-                        'bogie': '转向架',
-                        'catenary': '接触网'
-                };
-                let name = seatNameMap[k] || k;
-                seatHtml += `<span style="margin-right:20px;">${name}: ${v}张</span>`;
-        }
-        seatHtml += `</div>`;
-        
-        let depotHtml = train.depot ? `<div style="margin-top:8px; font-size:0.8rem; color:#6c7a8e;">🚩 路局：${escapeHtml(train.depot)}</div>` : '';
-        
-        let funHtml = '';
-        if (train.funFacts && train.funFacts.length > 0) {
-                funHtml = `<div style="margin-top: 16px; padding: 16px; background: #fff3e0; border-radius: 20px; border-left: 4px solid #ea580c;">
-                        <div style="font-weight: 700; margin-bottom: 10px;">📢 温馨提示</div>
-                        <div style="display: flex; flex-wrap: wrap; gap: 12px;">
-                                ${train.funFacts.map(f => `<span style="background: #fff0d0; padding: 6px 14px; border-radius: 30px; font-size: 0.8rem;">${escapeHtml(f)}</span>`).join('')}
-                        </div>
-                </div>`;
-        }
-        
-        container.innerHTML = `<div style="background:#f0f7fc; border-radius:24px; padding:20px;">
-                <div style="display:flex; justify-content:space-between; flex-wrap:wrap; align-items:center;">
-                        <div><span style="font-size:1.8rem; font-weight:700;">${train.trainNo}</span> ${getTrainBadgeHtml(train)}${depotHtml}</div>
-                        <div>${train.startStation} ${train.startTime} → ${train.endStation} ${train.endTime}  全程 ${train.duration}</div>
-                </div>
-                ${stopsHtml}
-                ${seatHtml}
-                ${funHtml}
-                <div style="margin-top: 20px; padding: 16px; background: #eef2f8; border-radius: 20px;">
-                        <div style="font-weight: 700; margin-bottom: 10px;">🚆 车型信息</div>
-                        <div style="margin-bottom: 12px;"><strong>${train.model || '未知'}</strong></div>
-                        <div style="text-align: center;">
-                                <img src="${train.model || 'unknown'}.jpg" alt="${train.model}" style="max-width: 100%; border-radius: 12px;" onerror="this.style.display='none'">
-                        </div>
-                </div>
+    const container = document.getElementById('trainByNoResult');
+    if (!container) return;
+    let stopsHtml = `<table class="train-table" style="margin-top:15px;"><thead><th>车站</th><th>到达时间</th><th>发车时间</th><th>停留时间</th></thead><tbody>`;
+    for (const s of train.stops) {
+        stopsHtml += `<tr>
+                <td>${escapeHtml(s.station)}</td>
+                <td>${s.arrive}</td>
+                <td>${s.depart}</td>
+                <td>${s.stay}分钟</td>
+            <tr>`;
+    }
+    stopsHtml += `</tbody><table>`;
+    let seatHtml = `<div style="margin-top:16px; background:#f8fafd; padding:12px; border-radius:16px;"><strong>🎫 席位余量</strong><br/>`;
+    for (let [k, v] of Object.entries(train.seats)) {
+        let seatNameMap = {
+            'business': '商务座', 'first': '一等座', 'premiumFirst': '优选一等座', 'second': '二等座',
+            'standing': '无座', 'driverRoom': '司机室', 'pantograph': '受电弓', 'bogie': '转向架', 'catenary': '接触网'
+        };
+        let name = seatNameMap[k] || k;
+        seatHtml += `<span style="margin-right:20px;">${name}: ${v}张</span>`;
+    }
+    seatHtml += `</div>`;
+    let depotHtml = train.depot ? `<div style="margin-top:8px; font-size:0.8rem; color:#6c7a8e;">🚩 路局：${escapeHtml(train.depot)}</div>` : '';
+    let funHtml = '';
+    if (train.funFacts && train.funFacts.length > 0) {
+        funHtml = `<div style="margin-top: 16px; padding: 16px; background: #fff3e0; border-radius: 20px; border-left: 4px solid #ea580c;">
+            <div style="font-weight: 700; margin-bottom: 10px;">📢 温馨提示</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+                ${train.funFacts.map(f => `<span style="background: #fff0d0; padding: 6px 14px; border-radius: 30px; font-size: 0.8rem;">${escapeHtml(f)}</span>`).join('')}
+            </div>
         </div>`;
+    }
+    container.innerHTML = `<div style="background:#f0f7fc; border-radius:24px; padding:20px;">
+        <div style="display:flex; justify-content:space-between; flex-wrap:wrap; align-items:center;">
+            <div><span style="font-size:1.8rem; font-weight:700;">${train.trainNo}</span> ${getTrainBadgeHtml(train)}${depotHtml}</div>
+            <div>${train.startStation} ${train.startTime} → ${train.endStation} ${train.endTime}  全程 ${calcDuration(train.startTime, train.endTime)}</div>
+        </div>
+        ${stopsHtml}
+        ${seatHtml}
+        ${funHtml}
+        <div style="margin-top: 20px; padding: 16px; background: #eef2f8; border-radius: 20px;">
+            <div style="font-weight: 700; margin-bottom: 10px;">🚆 车型信息</div>
+            <div style="margin-bottom: 12px;"><strong>${train.model || '未知'}</strong></div>
+            <div style="text-align: center;">
+                <img src="${train.model || 'unknown'}.jpg" alt="${train.model}" style="max-width: 100%; border-radius: 12px;" onerror="this.style.display='none'">
+            </div>
+        </div>
+    </div>`;
 }
 
 function renderStationSchedule(stationName) {
@@ -723,83 +749,57 @@ function initNavigation() {
 }
 
 async function loadData() {
-        try {
-                // 加载车站数据
-                const stationsResponse = await fetch('stations.json');
-                if (stationsResponse.ok) {
-                        stationsDatabase = await stationsResponse.json();
-                        console.log(`✅ 已加载 ${stationsDatabase.length} 个车站`);
-                } else {
-                        console.warn('⚠️ stations.json 加载失败');
-                }
-                
-                // 加载车次数据
-                const trainsResponse = await fetch('TrainNumbers.json');
-                if (trainsResponse.ok) {
-                        trainsDatabase = await trainsResponse.json();
-                        console.log(`✅ 已加载 ${trainsDatabase.length} 个车次`);
-                } else {
-                        console.warn('⚠️ TrainNumbers.json 加载失败');
-                }
-                
-                // 加载路局简介
-                const aboutResponse = await fetch('railways.html');
-                if (aboutResponse.ok) {
-                        const aboutHtml = await aboutResponse.text();
-                        document.getElementById('aboutPage').innerHTML = aboutHtml;
-                        console.log('✅ 已加载路局简介');
-                } else {
-                        console.warn('⚠️ railways.html 加载失败');
-                }
-                
-                updateHiddenSelects();
-                createSearchableSelect('fromStation', 'fromStationWrapper', '请选择出发站/城市');
-                createSearchableSelect('toStation', 'toStationWrapper', '请选择到达站/城市');
-                renderStationList('');
-                setDefaultDate();
-                initNavigation();
+    try {
+        await loadStations();
+        await loadTrains();
 
-                const searchBtn = document.getElementById('searchTrainsBtn');
-                if (searchBtn) searchBtn.addEventListener('click', handleHomeSearch);
+        updateHiddenSelects();
+        createSearchableSelect('fromStation', 'fromStationWrapper', '请选择出发站/城市');
+        createSearchableSelect('toStation', 'toStationWrapper', '请选择到达站/城市');
+        renderStationList('');
+        setDefaultDate();
+        initNavigation();
 
-                const searchTrainNoBtn = document.getElementById('searchByTrainNoBtn');
-                const trainNoInput = document.getElementById('trainNoInput');
-                if (searchTrainNoBtn) {
-                        searchTrainNoBtn.addEventListener('click', () => {
-                                const no = trainNoInput.value.trim();
-                                if (!no) { alert('请输入车次号'); return; }
-                                const train = searchTrainByNo(no);
-                                renderTrainDetail(train);
-                        });
-                }
-                if (trainNoInput) {
-                        trainNoInput.addEventListener('keypress', (e) => {
-                                if (e.key === 'Enter') searchTrainNoBtn.click();
-                        });
-                }
+        const searchBtn = document.getElementById('searchTrainsBtn');
+        if (searchBtn) searchBtn.addEventListener('click', handleHomeSearch);
 
-                const stationSearchInput = document.getElementById('stationSearchInput');
-                if (stationSearchInput) {
-                        stationSearchInput.addEventListener('input', () => {
-                                renderStationList(stationSearchInput.value);
-                        });
-                }
-
-                document.getElementById('trainResultArea').innerHTML = `<div style="text-align:center; padding:40px; color:#8a9bb0;">✨ 请选择始发站/城市和到达站/城市后点击查询 ✨</div>`;
-                
-                window.__MCRAILWAY_DB = {
-                        stations: stationsDatabase,
-                        trains: trainsDatabase,
-                        updateStations: (newStations) => { stationsDatabase = newStations; updateHiddenSelects(); renderStationList(''); },
-                        updateTrains: (newTrains) => { trainsDatabase = newTrains; },
-                        addTrain: (train) => { trainsDatabase.push(train); },
-                        addStation: (station) => { stationsDatabase.push(station); updateHiddenSelects(); renderStationList(''); }
-                };
-                console.log('✅ MC铁路12306已加载');
-                
-        } catch (error) {
-                console.error('❌ 数据加载失败:', error);
+        const searchTrainNoBtn = document.getElementById('searchByTrainNoBtn');
+        const trainNoInput = document.getElementById('trainNoInput');
+        if (searchTrainNoBtn) {
+            searchTrainNoBtn.addEventListener('click', () => {
+                const no = trainNoInput.value.trim();
+                if (!no) { alert('请输入车次号'); return; }
+                const train = searchTrainByNo(no);
+                renderTrainDetail(train);
+            });
         }
+        if (trainNoInput) {
+            trainNoInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') searchTrainNoBtn.click();
+            });
+        }
+
+        const stationSearchInput = document.getElementById('stationSearchInput');
+        if (stationSearchInput) {
+            stationSearchInput.addEventListener('input', () => {
+                renderStationList(stationSearchInput.value);
+            });
+        }
+
+        document.getElementById('trainResultArea').innerHTML = `<div style="text-align:center; padding:40px; color:#8a9bb0;">✨ 请选择始发站/城市和到达站/城市后点击查询 ✨</div>`;
+        
+        window.__MCRAILWAY_DB = {
+            stations: stationsDatabase,
+            trains: trainsDatabase,
+            updateStations: (newStations) => { stationsDatabase = newStations; updateHiddenSelects(); renderStationList(''); },
+            updateTrains: (newTrains) => { trainsDatabase = newTrains; },
+            addTrain: (train) => { trainsDatabase.push(train); },
+            addStation: (station) => { stationsDatabase.push(station); updateHiddenSelects(); renderStationList(''); }
+        };
+        console.log('✅ MC铁路12306已加载');
+    } catch (error) {
+        console.error('❌ 数据加载失败:', error);
+    }
 }
 
 loadData();
